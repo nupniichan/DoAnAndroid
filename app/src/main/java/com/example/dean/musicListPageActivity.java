@@ -2,6 +2,8 @@ package com.example.dean;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,8 +15,13 @@ import android.widget.PopupMenu;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class musicListPageActivity extends AppCompatActivity {
 
+    private RecyclerView musicRecylerView;
+    private MusicAdapter musicAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,15 +38,29 @@ public class musicListPageActivity extends AppCompatActivity {
         // Khởi tạo toolBar của trang danh sách nhạc
         Toolbar toolbar = findViewById(R.id.musicPageListToolBar);
         setSupportActionBar(toolbar);
-
-        ImageButton musicOptionMenu = findViewById(R.id.musicOptionMenu);
+        // Đang sửa ----------------
+/*        ImageButton musicOptionMenu = findViewById(R.id.musicOptionMenu);
         musicOptionMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 MusicOptionsBottomSheet bottomDialog = new MusicOptionsBottomSheet();
                 bottomDialog.show(getSupportFragmentManager(),"bottom_dialog");
             }
-        });
+        });*/
+        musicRecylerView = findViewById(R.id.musicListRecyclerView);
+        musicAdapter = new MusicAdapter(this);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,RecyclerView.VERTICAL,false);
+        musicRecylerView.setLayoutManager(linearLayoutManager);
+
+        musicAdapter.SetData(getMusicList());
+        musicRecylerView.setAdapter(musicAdapter);
+    }
+
+    private List<music> getMusicList() {
+        List<music> list = new ArrayList<>();
+        list.add(new music(R.drawable.gochiusa,"Gochiusa","Rabbit House",4));
+        return list;
     }
 
     @Override
