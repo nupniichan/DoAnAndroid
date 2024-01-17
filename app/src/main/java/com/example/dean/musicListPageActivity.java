@@ -38,15 +38,6 @@ public class musicListPageActivity extends AppCompatActivity {
         // Khởi tạo toolBar của trang danh sách nhạc
         Toolbar toolbar = findViewById(R.id.musicPageListToolBar);
         setSupportActionBar(toolbar);
-        // Đang sửa ----------------
-/*        ImageButton musicOptionMenu = findViewById(R.id.musicOptionMenu);
-        musicOptionMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MusicOptionsBottomSheet bottomDialog = new MusicOptionsBottomSheet();
-                bottomDialog.show(getSupportFragmentManager(),"bottom_dialog");
-            }
-        });*/
         musicRecylerView = findViewById(R.id.musicListRecyclerView);
         musicAdapter = new MusicAdapter(this);
 
@@ -59,7 +50,9 @@ public class musicListPageActivity extends AppCompatActivity {
 
     private List<music> getMusicList() {
         List<music> list = new ArrayList<>();
-        list.add(new music(R.drawable.gochiusa,"Gochiusa","Rabbit House",4));
+        list.add(new music(R.drawable.gochiusa,"Gochiusa","Rabbit House",270));
+        list.add(new music(R.drawable.gochiusa,"Gochiusa","Rabbit House",270));
+        list.add(new music(R.drawable.gochiusa,"Gochiusa","Rabbit House",270));
         return list;
     }
 

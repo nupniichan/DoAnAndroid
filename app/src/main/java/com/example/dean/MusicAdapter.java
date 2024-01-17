@@ -4,10 +4,12 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -33,12 +35,25 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
     @Override
     public void onBindViewHolder(@NonNull MusicViewHolder holder, int position) {
         music _music = musicList.get(position);
+        ImageButton musicOptionMenu = holder.itemView.findViewById(R.id.musicOptionMenu);
+        musicOptionMenu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MusicOptionsBottomSheet bottomDialog = new MusicOptionsBottomSheet();
+                bottomDialog.show(((AppCompatActivity)mContext).getSupportFragmentManager(),"bottom_dialog");
+            }
+        });
         if (_music == null)
             return;
         holder.imgMusic.setImageResource(_music.getResourceId());
         holder.musicTitle.setText(_music.getMusicTitle());
         holder.artistName.setText(_music.getArtist());
-        holder.musicLength.setText(_music.getMusicLength());
+        int musicLengthInSeconds = _music.getMusicLength();
+
+        // đổi dữ liệu đầu vào từ giây sang dạng phút:giây
+        int minutes = musicLengthInSeconds / 60;
+        int seconds = musicLengthInSeconds % 60;
+        holder.musicLength.setText(String.format("%02d:%02d", minutes, seconds));
     }
 
     @Override

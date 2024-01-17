@@ -19,22 +19,18 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <LinearLayout
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/musicPageListToolBar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
-                <androidx.appcompat.widget.Toolbar
-                    android:id="@+id/musicPageListToolBar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@color/black"
-                    android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                    app:popupTheme="@style/Theme.AppCompat.Light"
-                    app:title="Danh sách nhạc" />
-            </LinearLayout>
+                android:layout_height="wrap_content"
+                android:background="@color/black"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:popupTheme="@style/Theme.AppCompat.Light"
+                app:title="Danh sách nhạc" />
+
             <HorizontalScrollView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="15dp"
                 android:scrollbars="none">
 
@@ -45,7 +41,7 @@
 
                     <Button
                         android:id="@+id/button1"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="10dp"
                         android:backgroundTint="@color/gray"
@@ -55,7 +51,7 @@
 
                     <Button
                         android:id="@+id/button2"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="5dp"
                         android:backgroundTint="@color/gray"
@@ -66,16 +62,11 @@
                 </LinearLayout>
             </HorizontalScrollView>
 
-            <RelativeLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/musicListRecyclerView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="15dp">
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/musicListRecyclerView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
-                </androidx.recyclerview.widget.RecyclerView>
-            </RelativeLayout>
+                android:layout_height="wrap_content" />
+
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
