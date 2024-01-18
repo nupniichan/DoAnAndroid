@@ -67,7 +67,6 @@ public class musicListPageActivity extends AppCompatActivity {
     }
     private List<music> getMusicList() {
         List<music> list = new ArrayList<>();
-        list.add(new music(R.drawable.gochiusa,"Gochiusa","Rabbit House",270));
         return list;
     }
     private static final int PICK_AUDIO_REQUEST = 1;

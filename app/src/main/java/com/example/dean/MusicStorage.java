@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 public class MusicStorage {
@@ -26,5 +27,20 @@ public class MusicStorage {
         String json = sharedPreferences.getString(MUSIC_LIST_KEY, null);
         Type type = new TypeToken<ArrayList<music>>() {}.getType();
         return gson.fromJson(json, type);
+    }
+    public static void deleteMusic(Context context, music musicToDelete) {
+        List<music> musicList = getMusicList(context);
+        if (musicList != null) {
+            // Sử dụng Iterator để tránh ConcurrentModificationException
+            Iterator<music> iterator = musicList.iterator();
+            while (iterator.hasNext()) {
+                music _music = iterator.next();
+                if (_music.getResourceId() == musicToDelete.getResourceId()) {
+                    iterator.remove(); // Xoá phần tử hiện tại từ danh sách
+                    saveMusicList(context, musicList); // Lưu lại danh sách mới
+                    break; // Sau khi xoá, thoát khỏi vòng lặp
+                }
+            }
+        }
     }
 }
