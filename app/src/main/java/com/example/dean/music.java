@@ -4,9 +4,10 @@ public class music {
     private int resourceId;
     private String musicTitle;
     private String artist;
-    private int musicLength;
+    private long musicLength;
 
-    public music(int resourceId, String musicTitle, String artist, int musicLength){
+
+    public music(int resourceId, String musicTitle, String artist, long musicLength){
         this.resourceId = resourceId;
         this.musicTitle = musicTitle;
         this.artist = artist;
@@ -37,8 +38,8 @@ public class music {
         this.artist = artist;
     }
 
-    public int getMusicLength() {
-        return musicLength;
+    public long getMusicLength() {
+        return (int) musicLength;
     }
 
     public void setMusicLength(int musicLength) {

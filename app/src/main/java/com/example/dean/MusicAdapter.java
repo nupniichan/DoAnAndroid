@@ -1,6 +1,9 @@
 package com.example.dean;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaMetadataRetriever;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,11 +51,10 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
         holder.imgMusic.setImageResource(_music.getResourceId());
         holder.musicTitle.setText(_music.getMusicTitle());
         holder.artistName.setText(_music.getArtist());
-        int musicLengthInSeconds = _music.getMusicLength();
 
-        // đổi dữ liệu đầu vào từ giây sang dạng phút:giây
-        int minutes = musicLengthInSeconds / 60;
-        int seconds = musicLengthInSeconds % 60;
+        int musicLengthInMillis = (int)_music.getMusicLength();
+        int seconds = (int) (musicLengthInMillis / 1000) % 60;
+        int minutes = (int) ((musicLengthInMillis / (1000 * 60)) % 60);
         holder.musicLength.setText(String.format("%02d:%02d", minutes, seconds));
     }
 
@@ -77,5 +79,23 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
             artistName = itemView.findViewById(R.id.ArtistTextView);
             musicLength = itemView.findViewById(R.id.musicLengthTextView);
         }
+    }
+    private Bitmap getAlbumArt(String filePath) {
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(filePath);
+
+        byte[] art = retriever.getEmbeddedPicture();
+
+        if (art != null) {
+            return BitmapFactory.decodeByteArray(art, 0, art.length);
+        } else {
+            // Trả về ảnh mặc định hoặc một ảnh khác tùy ý
+            return getDefaultAlbumArt();
+        }
+    }
+
+    private Bitmap getDefaultAlbumArt() {
+        // Đọc ảnh từ tài nguyên drawable hoặc sử dụng ảnh mặc định tùy ý
+        return BitmapFactory.decodeResource(mContext.getResources(), R.drawable.gochiusa);
     }
 }
