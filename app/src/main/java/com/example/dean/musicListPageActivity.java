@@ -107,14 +107,18 @@ public class musicListPageActivity extends AppCompatActivity {
                 // Chuyển đổi đơn vị thời lượng thành milliseconds
                 long durationInMillis = Long.parseLong(audioDuration);
 
-                // Thêm tệp âm thanh vào danh sách âm nhạc
-                List<music> musicList = getMusicList();
+                // Thêm tệp âm thanh vào danh sách âm nhạc và lưu trữ vào SharedPreferences
+                List<music> musicList = getMusicListFromStorage();
                 musicList.add(new music(R.drawable.gochiusa, audioTitle, audioArtist, durationInMillis));
                 musicAdapter.SetData(musicList);
+
+                // Lưu trữ danh sách nhạc đã cập nhật vào SharedPreferences
+                Gson gson = new Gson();
+                String updatedJson = gson.toJson(musicList);
+                getSharedPreferences(MUSIC_PREFERENCE, Context.MODE_PRIVATE).edit().putString(MUSIC_LIST_KEY, updatedJson).apply();
             }
         }
     }
-
     public void ReturnToHomePage(){
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);

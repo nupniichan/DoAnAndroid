@@ -80,22 +80,4 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
             musicLength = itemView.findViewById(R.id.musicLengthTextView);
         }
     }
-    private Bitmap getAlbumArt(String filePath) {
-        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-        retriever.setDataSource(filePath);
-
-        byte[] art = retriever.getEmbeddedPicture();
-
-        if (art != null) {
-            return BitmapFactory.decodeByteArray(art, 0, art.length);
-        } else {
-            // Trả về ảnh mặc định hoặc một ảnh khác tùy ý
-            return getDefaultAlbumArt();
-        }
-    }
-
-    private Bitmap getDefaultAlbumArt() {
-        // Đọc ảnh từ tài nguyên drawable hoặc sử dụng ảnh mặc định tùy ý
-        return BitmapFactory.decodeResource(mContext.getResources(), R.drawable.gochiusa);
-    }
 }
