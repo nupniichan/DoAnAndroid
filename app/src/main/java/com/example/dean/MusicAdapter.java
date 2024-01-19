@@ -60,7 +60,15 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
         });
         if (_music == null)
             return;
-        holder.imgMusic.setImageResource(_music.getResourceId());
+        Bitmap albumArtBitmap = _music.getAlbumArtBitmap();
+        if (albumArtBitmap != null) {
+            // Nếu có, đặt vào ImageView
+            holder.imgMusic.setImageBitmap(albumArtBitmap);
+        } else {
+            // Nếu không có, đặt ảnh mặc định hoặc thực hiện xử lý khác
+            holder.imgMusic.setImageResource(R.drawable.ic_launcher_background);
+        }
+
         holder.musicTitle.setText(_music.getMusicTitle());
         holder.artistName.setText(_music.getArtist());
 

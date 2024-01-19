@@ -3,17 +3,24 @@ package com.example.dean;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.loader.content.CursorLoader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.reflect.TypeToken;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Debug;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
@@ -26,6 +33,9 @@ import android.widget.PopupMenu;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.gson.Gson;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +51,11 @@ public class musicListPageActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_list_page);
-
+        // Xoá dữ liệu (nếu bị lỗi dữ liệu thì hẵn xoá chứ ko thôi lỗi đó)
+/*        SharedPreferences sharedPreferences = getSharedPreferences("music_preference", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.commit();*/
         // Khởi tạo RecyclerView và Adapter
         musicRecylerView = findViewById(R.id.musicListRecyclerView);
         musicAdapter = new MusicAdapter(this);
@@ -93,22 +107,38 @@ public class musicListPageActivity extends AppCompatActivity {
         if (requestCode == PICK_AUDIO_REQUEST && resultCode == RESULT_OK) {
             if (data != null && data.getData() != null) {
                 Uri selectedAudioUri = data.getData();
-
                 // Sử dụng MediaMetadataRetriever để lấy thông tin chi tiết về tệp âm thanh
                 MediaMetadataRetriever retriever = new MediaMetadataRetriever();
                 retriever.setDataSource(this, selectedAudioUri);
+
+                // Chuyển đổi URI thành đối tượng File
+                File audioFile = new File(selectedAudioUri.getPath());
+
+                // Lấy đường dẫn đầy đủ của tệp âm thanh
+                String filePath = audioFile.getAbsolutePath();
 
                 // Lấy thông tin
                 String audioTitle = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
                 String audioArtist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
                 String audioDuration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
 
+                // Debug xem lấy được đường dẫn file chưa
+                Log.d("FilePath", filePath != null ? filePath : "Path is null");
+
                 // Chuyển đổi đơn vị thời lượng thành milliseconds
                 long durationInMillis = Long.parseLong(audioDuration);
 
+                // Lấy album art
+                byte[] albumArtBytes = retriever.getEmbeddedPicture();
+                Bitmap albumArtBitmap = null;
+                {
+                    albumArtBitmap = BitmapFactory.decodeByteArray(albumArtBytes, 0, albumArtBytes.length);
+                }
+                if (albumArtBytes != null)
+                Log.d("AlbumArt",albumArtBitmap.toString());
                 // Thêm tệp âm thanh vào danh sách âm nhạc và lưu trữ vào SharedPreferences
                 List<music> musicList = getMusicListFromStorage();
-                musicList.add(new music(R.drawable.gochiusa, audioTitle, audioArtist, durationInMillis));
+                musicList.add(new music(R.drawable.gochiusa, audioTitle, audioArtist, durationInMillis,filePath,albumArtBitmap));
                 musicAdapter.SetData(musicList);
 
                 // Lưu trữ danh sách nhạc đã cập nhật vào SharedPreferences
