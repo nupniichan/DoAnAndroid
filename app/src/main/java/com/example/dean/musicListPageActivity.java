@@ -52,7 +52,7 @@ public class musicListPageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_list_page);
         // Xoá dữ liệu (nếu bị lỗi dữ liệu thì hẵn xoá chứ ko thôi lỗi đó)
-/*        SharedPreferences sharedPreferences = getSharedPreferences("music_preference", Context.MODE_PRIVATE);
+/*        SharedPreferences sharedPreferences = getSharedPreferences(MUSIC_PREFERENCE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.commit();*/
@@ -130,16 +130,14 @@ public class musicListPageActivity extends AppCompatActivity {
 
                 // Lấy album art
                 byte[] albumArtBytes = retriever.getEmbeddedPicture();
-                Bitmap albumArtBitmap = null;
-                {
-                    albumArtBitmap = BitmapFactory.decodeByteArray(albumArtBytes, 0, albumArtBytes.length);
-                }
-                if (albumArtBytes != null)
-                Log.d("AlbumArt",albumArtBitmap.toString());
+                Bitmap albumArtBitmap;
+                albumArtBitmap = BitmapFactory.decodeByteArray(albumArtBytes, 0, albumArtBytes.length);
+
                 // Thêm tệp âm thanh vào danh sách âm nhạc và lưu trữ vào SharedPreferences
                 List<music> musicList = getMusicListFromStorage();
-                musicList.add(new music(R.drawable.gochiusa, audioTitle, audioArtist, durationInMillis,filePath,albumArtBitmap));
+                musicList.add(new music(R.drawable.gochiusa, audioTitle, audioArtist, durationInMillis,filePath, albumArtBitmap));
                 musicAdapter.SetData(musicList);
+                musicAdapter.notifyDataSetChanged();
 
                 // Lưu trữ danh sách nhạc đã cập nhật vào SharedPreferences
                 Gson gson = new Gson();
@@ -148,6 +146,12 @@ public class musicListPageActivity extends AppCompatActivity {
             }
         }
     }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        musicAdapter.SetData(getMusicListFromStorage());
+    }
+
     public void ReturnToHomePage(){
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);

@@ -21,8 +21,12 @@ public class MusicOptionsBottomSheet extends BottomSheetDialogFragment {
         return view;
     }
     private View.OnClickListener deleteClickListener;
+    private View.OnClickListener playClickListener;
     public void setOnDeleteClickListener(View.OnClickListener listener) {
         deleteClickListener = listener;
+    }
+    public void setPlayClickListener(View.OnClickListener listener){
+        playClickListener = listener;
     }
     private void setupCardViews(View view) {
         CardView deleteCardView = view.findViewById(R.id.musicOptionRemove);
@@ -32,5 +36,9 @@ public class MusicOptionsBottomSheet extends BottomSheetDialogFragment {
         }
 
         // Các CardView khác tương tự
+        CardView playMusicCardView = view.findViewById(R.id.playMusicCardView);
+        if (playMusicCardView != null && playClickListener != null){
+            playMusicCardView.setOnClickListener(playClickListener);
+        }
     }
 }

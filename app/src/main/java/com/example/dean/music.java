@@ -11,9 +11,6 @@ public class music {
 
     private Bitmap albumArtBitmap;
 
-
-    private String imagePath;
-
     public String getFilePath() {
         return filePath;
     }

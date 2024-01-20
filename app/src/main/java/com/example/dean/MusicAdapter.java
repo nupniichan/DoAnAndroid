@@ -1,9 +1,13 @@
 package com.example.dean;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaMetadataRetriever;
+import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
 
+import java.io.ByteArrayOutputStream;
 import java.util.List;
 
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHolder> {
@@ -46,6 +51,14 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
             @Override
             public void onClick(View v) {
                 MusicOptionsBottomSheet bottomDialog = new MusicOptionsBottomSheet();
+                bottomDialog.setPlayClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int position = holder.getAdapterPosition();
+                        playMusic(position);
+                        bottomDialog.dismiss();
+                    }
+                });
                 bottomDialog.setOnDeleteClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -88,7 +101,16 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
             Gson gson = new Gson();
             String updatedJson = gson.toJson(musicList);
             mContext.getSharedPreferences(MUSIC_PREFERENCE, Context.MODE_PRIVATE).edit().putString(MUSIC_LIST_KEY, updatedJson).apply();
-
+        }
+    }
+    public void playMusic(int position) {
+        if (position >= 0 && position < musicList.size()) {
+            music selectedMusic = musicList.get(position);
+            Intent intent = new Intent(mContext, MusicPlayer.class);
+            intent.putExtra("musicName", selectedMusic.getMusicTitle());
+            intent.putExtra("artistName", selectedMusic.getArtist());
+            SharedBitmapHolder.getInstance().setSharedBitmap(selectedMusic.getAlbumArtBitmap());
+            mContext.startActivity(intent);
         }
     }
     @Override
