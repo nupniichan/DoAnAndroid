@@ -91,6 +91,7 @@ public class musicListPageActivity extends AppCompatActivity {
         addBoxItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(@NonNull MenuItem item) {
+                // Để người dùng bấm cái phím + để add file vô
                 Intent intent = new Intent();
                 intent.setType("audio/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -100,6 +101,8 @@ public class musicListPageActivity extends AppCompatActivity {
         });
         return true;
     }
+
+    // Khi add file vào xong sẽ xử lý sự kiện là khi lấy xong mình sẽ đạt được gì
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -121,21 +124,22 @@ public class musicListPageActivity extends AppCompatActivity {
                 String audioTitle = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
                 String audioArtist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
                 String audioDuration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-
+/*
                 // Debug xem lấy được đường dẫn file chưa
-                Log.d("FilePath", filePath != null ? filePath : "Path is null");
+                Log.d("FilePath", filePath != null ? filePath : "Path is null");*/
 
-                // Chuyển đổi đơn vị thời lượng thành milliseconds
+                // Chuyển đổi đơn vị thời lượng thành milliseconds (vì khi lấy vô nó ở dạng miliseconds)
                 long durationInMillis = Long.parseLong(audioDuration);
 
-                // Lấy album art
+                // Lấy dữ liệu album art
                 byte[] albumArtBytes = retriever.getEmbeddedPicture();
                 Bitmap albumArtBitmap;
                 albumArtBitmap = BitmapFactory.decodeByteArray(albumArtBytes, 0, albumArtBytes.length);
+                String albumArtFilePath = saveAlbumArtToFile(albumArtBitmap, "album_art_" + System.currentTimeMillis() + ".png");
 
                 // Thêm tệp âm thanh vào danh sách âm nhạc và lưu trữ vào SharedPreferences
                 List<music> musicList = getMusicListFromStorage();
-                musicList.add(new music(R.drawable.gochiusa, audioTitle, audioArtist, durationInMillis,filePath, albumArtBitmap));
+                musicList.add(new music(R.drawable.gochiusa, audioTitle, audioArtist, durationInMillis,albumArtFilePath, albumArtBitmap));
                 musicAdapter.SetData(musicList);
                 musicAdapter.notifyDataSetChanged();
 
@@ -145,6 +149,30 @@ public class musicListPageActivity extends AppCompatActivity {
                 getSharedPreferences(MUSIC_PREFERENCE, Context.MODE_PRIVATE).edit().putString(MUSIC_LIST_KEY, updatedJson).apply();
             }
         }
+    }
+    private String saveAlbumArtToFile(Bitmap albumArtBitmap, String fileName) {
+        ContextWrapper contextWrapper = new ContextWrapper(getApplicationContext());
+        File directory = contextWrapper.getDir("albumArtDir", Context.MODE_PRIVATE);
+        File filePath = new File(directory, fileName);
+
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(filePath);
+            albumArtBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            fos.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (fos != null) {
+                    fos.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return filePath.getAbsolutePath();
     }
     @Override
     protected void onResume() {

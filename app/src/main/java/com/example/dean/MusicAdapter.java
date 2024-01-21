@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaMetadataRetriever;
+import android.net.Uri;
 import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,9 +20,11 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.List;
 
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHolder> {
@@ -73,10 +76,13 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
         });
         if (_music == null)
             return;
+
         Bitmap albumArtBitmap = _music.getAlbumArtBitmap();
         if (albumArtBitmap != null) {
-            // Nếu có, đặt vào ImageView
-            holder.imgMusic.setImageBitmap(albumArtBitmap);
+            Glide.with(mContext)
+                    .load(Uri.fromFile(new File(_music.getFilePath())))
+                    .error(R.drawable.ic_launcher_background)
+                    .into(holder.imgMusic);
         } else {
             // Nếu không có, đặt ảnh mặc định hoặc thực hiện xử lý khác
             holder.imgMusic.setImageResource(R.drawable.ic_launcher_background);
@@ -89,8 +95,8 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
         int seconds = (int) (musicLengthInMillis / 1000) % 60;
         int minutes = (int) ((musicLengthInMillis / (1000 * 60)) % 60);
         holder.musicLength.setText(String.format("%02d:%02d", minutes, seconds));
-
     }
+
     public void removeMusic(int position) {
         if (position >= 0 && position < musicList.size()) {
             musicList.remove(position);
@@ -109,7 +115,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
             Intent intent = new Intent(mContext, MusicPlayer.class);
             intent.putExtra("musicName", selectedMusic.getMusicTitle());
             intent.putExtra("artistName", selectedMusic.getArtist());
-            SharedBitmapHolder.getInstance().setSharedBitmap(selectedMusic.getAlbumArtBitmap());
+            intent.putExtra("albumArtFilePath", selectedMusic.getFilePath()); 
             mContext.startActivity(intent);
         }
     }

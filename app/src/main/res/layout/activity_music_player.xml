@@ -5,153 +5,161 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MusicPlayer">
-    <LinearLayout
+
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <RelativeLayout
-            android:id="@+id/layout_top_btn"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:background="@drawable/gredient_bg">
-
-            <ImageView
-                android:id="@+id/back_btn"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_centerVertical="true"
-                android:src="@drawable/baseline_chevron_left" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_toEndOf="@+id/back_btn"
-                android:background="@android:color/transparent"
-                android:gravity="center_horizontal"
-                android:text="Hiện đang phát"
-                android:textColor="@color/white"
-                android:textSize="18dp"
-                android:textStyle="bold" />
-
-            <ImageView
-                android:id="@+id/menu_btn"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:src="@drawable/baseline_menu" />
-
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/card"
-            android:layout_width="match_parent"
-            android:layout_height="350dp">
-
-            <ImageView
-                android:id="@+id/cover_art"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@drawable/delete_vector" />
-
-            <ImageView
-                android:id="@+id/ImageViewGredient"
-                android:layout_width="match_parent"
-                android:layout_height="250dp"
-                android:layout_alignParentBottom="true"
-                android:src="@drawable/gredient_bg" />
-
-        </RelativeLayout>
+        android:layout_height="match_parent" >
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="268dp"
+            android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/song_name"
+            <LinearLayout
+                android:id="@+id/layout_top_btn"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="32dp"
-                android:layout_marginTop="55dp"
-                android:layout_marginEnd="32dp"
-                android:ellipsize="end"
-                android:gravity="center_horizontal"
-                android:singleLine="true"
-                android:text="Song Name"
-                android:textColor="@color/white"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:layout_height="50dp"
+                android:background="@drawable/gredient_bg"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/song_artist"
+                <ImageView
+                    android:id="@+id/back_btn"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:src="@drawable/baseline_chevron_left" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:gravity="center_horizontal"
+                    android:text="Hiện đang phát"
+                    android:textColor="@color/white"
+                    android:textSize="18dp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/menu_btn"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:src="@drawable/baseline_menu" />
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/card"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="32dp"
-                android:layout_marginEnd="32dp"
-                android:ellipsize="end"
-                android:gravity="center_horizontal"
-                android:singleLine="true"
-                android:text="Artist"
-                android:textColor="@color/white"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:layout_height="350dp">
+
+                <ImageView
+                    android:id="@+id/cover_art"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/delete_vector" />
+
+                <ImageView
+                    android:id="@+id/ImageViewGredient"
+                    android:layout_width="match_parent"
+                    android:layout_height="250dp"
+                    android:layout_alignParentBottom="true"
+                    android:src="@drawable/gredient_bg" />
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="268dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/song_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="63dp"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginTop="55dp"
+                    android:layout_marginEnd="32dp"
+                    android:ellipsize="end"
+                    android:gravity="center_horizontal"
+                    android:singleLine="true"
+                    android:text="Song Name"
+                    android:textColor="@color/white"
+                    android:textSize="34sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/song_artist"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginEnd="32dp"
+                    android:ellipsize="end"
+                    android:gravity="center_horizontal"
+                    android:singleLine="true"
+                    android:text="Artist"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/relative_layout_for_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="@drawable/gredient_bg">
+
+                <ImageView
+                    android:id="@+id/id_shuffle"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="32dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/baseline_shuffle" />
+
+                <ImageView
+                    android:id="@+id/id_prev"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:src="@drawable/baseline_skip_previous" />
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/play_pause"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:contentDescription="buttonPlay"
+                    android:focusable="true"
+                    android:src="@drawable/baseline_play_arrow" />
+
+                <ImageView
+                    android:id="@+id/id_next"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:src="@drawable/baseline_skip_next" />
+
+                <ImageView
+                    android:id="@+id/id_repeat"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:src="@drawable/baseline_repeat_24" />
+
+            </LinearLayout>
         </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/relative_layout_for_bottom"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:background="@drawable/gredient_bg">
-
-            <ImageView
-                android:id="@+id/id_shuffle"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
-                android:layout_gravity="center"
-                android:layout_marginLeft="32dp"
-                android:layout_weight="1"
-                android:src="@drawable/baseline_shuffle" />
-
-            <ImageView
-                android:id="@+id/id_prev"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:src="@drawable/baseline_skip_previous" />
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/play_pause"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:clickable="true"
-                android:contentDescription="buttonPlay"
-                android:focusable="true"
-                android:src="@drawable/baseline_play_arrow" />
-
-            <ImageView
-                android:id="@+id/id_next"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:src="@drawable/baseline_skip_next" />
-
-            <ImageView
-                android:id="@+id/id_repeat"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:src="@drawable/baseline_repeat_24" />
-
-        </LinearLayout>
-    </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
