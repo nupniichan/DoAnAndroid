@@ -3,6 +3,7 @@ package com.example.dean;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.documentfile.provider.DocumentFile;
 import androidx.loader.content.CursorLoader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -36,6 +37,8 @@ import com.google.gson.Gson;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -113,20 +116,19 @@ public class musicListPageActivity extends AppCompatActivity {
                 // Sử dụng MediaMetadataRetriever để lấy thông tin chi tiết về tệp âm thanh
                 MediaMetadataRetriever retriever = new MediaMetadataRetriever();
                 retriever.setDataSource(this, selectedAudioUri);
+                String filePath = getRealPathFromUri(selectedAudioUri);
 
-                // Chuyển đổi URI thành đối tượng File
-                File audioFile = new File(selectedAudioUri.getPath());
-
-                // Lấy đường dẫn đầy đủ của tệp âm thanh
-                String filePath = audioFile.getAbsolutePath();
+                // Lưu trữ tệp âm thanh MP3 vào bộ nhớ trong ứng dụng
+                String mp3FileName = "audio_" + System.currentTimeMillis() + ".mp3";
+                String mp3FilePath = saveMp3File(selectedAudioUri, mp3FileName);
+                Log.d("mp3FilePath",mp3FilePath);
+                retriever.setDataSource(this, selectedAudioUri);
+                Log.d("filepath", filePath);
 
                 // Lấy thông tin
                 String audioTitle = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
                 String audioArtist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
                 String audioDuration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-/*
-                // Debug xem lấy được đường dẫn file chưa
-                Log.d("FilePath", filePath != null ? filePath : "Path is null");*/
 
                 // Chuyển đổi đơn vị thời lượng thành milliseconds (vì khi lấy vô nó ở dạng miliseconds)
                 long durationInMillis = Long.parseLong(audioDuration);
@@ -136,10 +138,9 @@ public class musicListPageActivity extends AppCompatActivity {
                 Bitmap albumArtBitmap;
                 albumArtBitmap = BitmapFactory.decodeByteArray(albumArtBytes, 0, albumArtBytes.length);
                 String albumArtFilePath = saveAlbumArtToFile(albumArtBitmap, "album_art_" + System.currentTimeMillis() + ".png");
-
                 // Thêm tệp âm thanh vào danh sách âm nhạc và lưu trữ vào SharedPreferences
                 List<music> musicList = getMusicListFromStorage();
-                musicList.add(new music(R.drawable.gochiusa, audioTitle, audioArtist, durationInMillis,albumArtFilePath, albumArtBitmap));
+                musicList.add(new music(R.drawable.gochiusa, audioTitle, audioArtist, durationInMillis,albumArtFilePath, albumArtBitmap, mp3FilePath ));
                 musicAdapter.SetData(musicList);
                 musicAdapter.notifyDataSetChanged();
 
@@ -149,6 +150,14 @@ public class musicListPageActivity extends AppCompatActivity {
                 getSharedPreferences(MUSIC_PREFERENCE, Context.MODE_PRIVATE).edit().putString(MUSIC_LIST_KEY, updatedJson).apply();
             }
         }
+    }
+    private String getRealPathFromUri(Uri uri) {
+        String filePath = null;
+        DocumentFile documentFile = DocumentFile.fromSingleUri(this, uri);
+        if (documentFile != null) {
+            filePath = documentFile.getUri().getPath();
+        }
+        return filePath;
     }
     private String saveAlbumArtToFile(Bitmap albumArtBitmap, String fileName) {
         ContextWrapper contextWrapper = new ContextWrapper(getApplicationContext());
@@ -173,6 +182,45 @@ public class musicListPageActivity extends AppCompatActivity {
         }
 
         return filePath.getAbsolutePath();
+    }
+    private String saveMp3File(Uri audioUri, String fileName) {
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+        try {
+            // Mở InputStream từ Uri của tệp âm thanh được chọn
+            inputStream = getContentResolver().openInputStream(audioUri);
+
+            // Tạo đường dẫn cho tệp âm thanh trong bộ nhớ trong của ứng dụng
+            File directory = getDir("audioDir", Context.MODE_PRIVATE);
+            File filePath = new File(directory, fileName);
+
+            // Mở OutputStream để ghi dữ liệu vào tệp âm thanh
+            outputStream = new FileOutputStream(filePath);
+
+            // Sao chép dữ liệu từ InputStream sang OutputStream
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, length);
+            }
+
+            return filePath.getAbsolutePath();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            try {
+                // Đóng InputStream và OutputStream
+                if (inputStream != null) {
+                    inputStream.close();
+                }
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
     @Override
     protected void onResume() {

@@ -9,24 +9,28 @@ public class music {
     private long musicLength;
     private String filePath;
 
+    private String uriFilePath;
     private Bitmap albumArtBitmap;
 
     public String getFilePath() {
         return filePath;
     }
 
+    public String getUriFilePath() { return uriFilePath; }
+
     public void setFilePath(String filePath) {
         this.filePath = filePath;
     }
 
 
-    public music(int resourceId, String musicTitle, String artist, long musicLength,String filePath, Bitmap albumArtBitmap){
+    public music(int resourceId, String musicTitle, String artist, long musicLength,String filePath, Bitmap albumArtBitmap, String uriFilePath){
         this.resourceId = resourceId;
         this.musicTitle = musicTitle;
         this.artist = artist;
         this.musicLength = musicLength;
         this.filePath = filePath;
         this.albumArtBitmap = albumArtBitmap;
+        this.uriFilePath = uriFilePath;
     }
 
     public Bitmap getAlbumArtBitmap() {

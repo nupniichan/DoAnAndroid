@@ -115,7 +115,8 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
             Intent intent = new Intent(mContext, MusicPlayer.class);
             intent.putExtra("musicName", selectedMusic.getMusicTitle());
             intent.putExtra("artistName", selectedMusic.getArtist());
-            intent.putExtra("albumArtFilePath", selectedMusic.getFilePath()); 
+            intent.putExtra("albumArtFilePath", selectedMusic.getFilePath());
+            intent.putExtra("musicFilePath", selectedMusic.getUriFilePath());
             mContext.startActivity(intent);
         }
     }
