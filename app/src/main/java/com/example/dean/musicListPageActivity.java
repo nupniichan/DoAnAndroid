@@ -54,26 +54,24 @@ public class musicListPageActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_list_page);
+
         // Xoá dữ liệu (nếu bị lỗi dữ liệu thì hẵn xoá chứ ko thôi lỗi đó)
 /*        SharedPreferences sharedPreferences = getSharedPreferences(MUSIC_PREFERENCE, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.clear();
         editor.commit();*/
-        // Khởi tạo RecyclerView và Adapter
-        musicRecylerView = findViewById(R.id.musicListRecyclerView);
-        musicAdapter = new MusicAdapter(this);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, RecyclerView.VERTICAL, false);
-        musicRecylerView.setLayoutManager(linearLayoutManager);
 
-        // Lấy danh sách nhạc từ SharedPreferences và cập nhật RecyclerView
-        musicAdapter.SetData(getMusicListFromStorage());
-        musicRecylerView.setAdapter(musicAdapter);
+        // Khởi tạo RecyclerView và Adapter
+        CreateRecyclerViewAndAdapter();
 
         // Khởi tạo toolBar của trang danh sách nhạc
-        Toolbar toolbar = findViewById(R.id.musicPageListToolBar);
-        setSupportActionBar(toolbar);
+        CreateToolBar();
 
         // Button quay về lại trang chủ
+        CreateHomeButton();
+    }
+
+    private void CreateHomeButton() {
         Button homeButton = findViewById(R.id.button1);
         homeButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,11 +80,30 @@ public class musicListPageActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void CreateToolBar() {
+        Toolbar toolbar = findViewById(R.id.musicPageListToolBar);
+        setSupportActionBar(toolbar);
+    }
+
+    private void CreateRecyclerViewAndAdapter() {
+        musicRecylerView = findViewById(R.id.musicListRecyclerView);
+        musicAdapter = new MusicAdapter(this);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, RecyclerView.VERTICAL, false);
+        musicRecylerView.setLayoutManager(linearLayoutManager);
+
+        // Lấy danh sách nhạc từ SharedPreferences và cập nhật RecyclerView
+        musicAdapter.SetData(getMusicListFromStorage());
+        musicRecylerView.setAdapter(musicAdapter);
+    }
+
     private List<music> getMusicList() {
         List<music> list = new ArrayList<>();
         return list;
     }
     private static final int PICK_AUDIO_REQUEST = 1;
+
+    // Tạo option menu (nghĩa là cái bấm vào rồi nó hiện cái bảng ở dưới ấy)
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.musiclistpage_toolbar,menu);
@@ -138,6 +155,7 @@ public class musicListPageActivity extends AppCompatActivity {
                 Bitmap albumArtBitmap;
                 albumArtBitmap = BitmapFactory.decodeByteArray(albumArtBytes, 0, albumArtBytes.length);
                 String albumArtFilePath = saveAlbumArtToFile(albumArtBitmap, "album_art_" + System.currentTimeMillis() + ".png");
+
                 // Thêm tệp âm thanh vào danh sách âm nhạc và lưu trữ vào SharedPreferences
                 List<music> musicList = getMusicListFromStorage();
                 musicList.add(new music(R.drawable.gochiusa, audioTitle, audioArtist, durationInMillis,albumArtFilePath, albumArtBitmap, mp3FilePath ));

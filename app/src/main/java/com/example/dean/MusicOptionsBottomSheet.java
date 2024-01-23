@@ -35,7 +35,6 @@ public class MusicOptionsBottomSheet extends BottomSheetDialogFragment {
             deleteCardView.setOnClickListener(deleteClickListener);
         }
 
-        // Các CardView khác tương tự
         CardView playMusicCardView = view.findViewById(R.id.playMusicCardView);
         if (playMusicCardView != null && playClickListener != null){
             playMusicCardView.setOnClickListener(playClickListener);

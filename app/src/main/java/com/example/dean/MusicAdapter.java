@@ -66,7 +66,6 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
                     @Override
                     public void onClick(View view) {
                         int position = holder.getAdapterPosition();
-                        // Thực hiện hành động xoá dựa trên vị trí hoặc thông tin từ adapter
                         removeMusic(position);
                         bottomDialog.dismiss();
                     }
@@ -84,13 +83,12 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
                     .error(R.drawable.ic_launcher_background)
                     .into(holder.imgMusic);
         } else {
-            // Nếu không có, đặt ảnh mặc định hoặc thực hiện xử lý khác
+            // Nếu ko thì có đặt ảnh mặc định
             holder.imgMusic.setImageResource(R.drawable.ic_launcher_background);
         }
 
         holder.musicTitle.setText(_music.getMusicTitle());
         holder.artistName.setText(_music.getArtist());
-
         int musicLengthInMillis = (int)_music.getMusicLength();
         int seconds = (int) (musicLengthInMillis / 1000) % 60;
         int minutes = (int) ((musicLengthInMillis / (1000 * 60)) % 60);
