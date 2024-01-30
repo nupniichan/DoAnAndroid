@@ -41,10 +41,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.person_vector){
-            System.out.println("Da bam vao icon hinh nguoi");
-            return true;
-        }
+
         return super.onOptionsItemSelected(item);
     }
 }

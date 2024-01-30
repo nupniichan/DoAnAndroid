@@ -2,11 +2,21 @@ package com.example.dean;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.palette.graphics.Palette;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.view.View;
+import androidx.core.content.ContextCompat;
+import androidx.palette.graphics.Palette;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -33,7 +43,7 @@ public class MusicPlayer extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_player);
-        setData();
+        SetData();
 
         Intent intent = getIntent();
         mediaPlayer = new MediaPlayer();
@@ -105,7 +115,7 @@ public class MusicPlayer extends AppCompatActivity {
                         playPauseButton.setImageResource(R.drawable.baseline_pause);
                     }
                 } catch (IOException | IllegalStateException e) {
-                    Log.e("MusicPlayer", "Error handling play/pause", e);
+                    Log.e("MusicPlayer", "Error", e);
                 }
             }
         });
@@ -147,7 +157,7 @@ public class MusicPlayer extends AppCompatActivity {
         }
     }
 
-    private void setData() {
+    private void SetData() {
         Intent intent = getIntent();
 
         ImageView albumArtImageView = findViewById(R.id.cover_art);
@@ -162,12 +172,30 @@ public class MusicPlayer extends AppCompatActivity {
         String getArtistName = intent.getStringExtra("artistName");
         String albumArtFilePath = intent.getStringExtra("albumArtFilePath");
 
+
         // Sử dụng Glide để tải hình ảnh từ đường dẫn file
         Glide.with(this)
-                .load(Uri.fromFile((new File(albumArtFilePath))))
+                .asBitmap()
+                .load(Uri.fromFile(new File(albumArtFilePath)))
                 .error(R.drawable.ic_launcher_background)
-                .into(albumArtImageView);
+                .into(new SimpleTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(Bitmap originalBitmap, Transition<? super Bitmap> transition) {
+                        Bitmap paletteBitmap = originalBitmap.copy(originalBitmap.getConfig(), true);
+                        int dominantColor = Palette.from(paletteBitmap).generate().getDominantColor(ContextCompat.getColor(getApplicationContext(), android.R.color.black));
+                        View musicPlayerView = findViewById(R.id.music_player_view);
+                        musicPlayerView.setBackgroundColor(dominantColor);
+                        ImageView albumArtImageView = findViewById(R.id.cover_art);
+                        albumArtImageView.setImageBitmap(originalBitmap);
 
+                        // Lưu ý: Bạn không cần set layout params khi sử dụng wrap_content cho width và height
+                        // Nếu bạn muốn sử dụng kích thước cố định, bạn có thể sử dụng layout params như sau:
+                        // albumArtImageView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 350));
+
+                        // Hoặc nếu bạn muốn giữ nguyên kích thước theo tỷ lệ khung hình (aspect ratio) và sử dụng fitCenter:
+                        // albumArtImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                    }
+                });
         songName.setText(getMusicName);
         artistName.setText(getArtistName);
     }

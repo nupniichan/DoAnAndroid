@@ -15,31 +15,49 @@ android:layout_marginTop="20dp">
         android:id="@+id/musicImageView"
         android:layout_width="70dp"
         android:layout_height="70dp"
+        android:layout_weight="1"
+        android:scaleType="centerInside"
         android:src="@drawable/yoasobi" />
 
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:layout_marginLeft="4dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="4dp">
 
         <TextView
             android:id="@+id/musicNameTextView"
-            android:layout_width="200dp"
-            android:layout_height="30dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginTop="5dp"
+            android:layout_width="190dp"
+            android:layout_height="20dp"
+            android:layout_marginTop="10dp"
             android:layout_weight="1"
+            android:ellipsize="marquee"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:maxWidth="190dp"
+            android:scrollHorizontally="true"
+            android:singleLine="true"
             android:text="Tên bài hát"
             android:textSize="16sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/ArtistTextView"
-            android:layout_width="match_parent"
+            android:layout_width="190dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginBottom="2dp"
             android:layout_weight="1"
+            android:ellipsize="marquee"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:maxWidth="190dp"
+            android:maxHeight="18dp"
+            android:scrollHorizontally="true"
+            android:singleLine="true"
             android:text="Tác giả" />
     </LinearLayout>
 
@@ -48,6 +66,7 @@ android:layout_marginTop="20dp">
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_weight="1"
         android:text="mm:ss"
         android:textSize="12sp" />
 
