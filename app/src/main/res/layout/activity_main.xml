@@ -1,31 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/black"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/Theme.AppCompat.Light"
+        app:title="Otaku music" />
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:layout_editor_absoluteX="-16dp"
-        android:scrollbars="none"
-        tools:layout_editor_absoluteY="0dp">
+        android:scrollbars="none">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/black"
-                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-                app:popupTheme="@style/Theme.AppCompat.Light"
-                app:title="Otaku music" />
 
             <HorizontalScrollView
                 android:layout_width="match_parent"
@@ -486,7 +484,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="10dp"
                                     android:text="Tên bài hát"
-                                    android:textStyle="bold"/>
+                                    android:textStyle="bold" />
 
                                 <TextView
                                     android:id="@+id/MadeForYouAuthor1"
@@ -524,7 +522,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="10dp"
                                     android:text="Tên bài hát"
-                                    android:textStyle="bold"/>
+                                    android:textStyle="bold" />
 
                                 <TextView
                                     android:id="@+id/MadeForYouAuthor2"
@@ -562,7 +560,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="10dp"
                                     android:text="Tên bài hát"
-                                    android:textStyle="bold"/>
+                                    android:textStyle="bold" />
 
                                 <TextView
                                     android:id="@+id/MadeForYouAuthor3"
@@ -601,7 +599,7 @@
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="10dp"
                                     android:text="Tên bài hát"
-                                    android:textStyle="bold"/>
+                                    android:textStyle="bold" />
 
                                 <TextView
                                     android:id="@+id/MadeForYouAuthor4"
@@ -695,9 +693,9 @@
                                     android:id="@+id/recentlyPlayedTextView1"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:text="TextView"
                                     android:layout_marginTop="3dp"
-                                    android:textStyle="bold"/>
+                                    android:text="TextView"
+                                    android:textStyle="bold" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
@@ -723,9 +721,9 @@
                                     android:id="@+id/recentlyPlayedTextView2"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:text="TextView"
                                     android:layout_marginTop="3dp"
-                                    android:textStyle="bold"/>
+                                    android:text="TextView"
+                                    android:textStyle="bold" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
@@ -751,9 +749,9 @@
                                     android:id="@+id/recentlyPlayedTextView3"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:text="TextView"
                                     android:layout_marginTop="3dp"
-                                    android:textStyle="bold"/>
+                                    android:text="TextView"
+                                    android:textStyle="bold" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
@@ -779,9 +777,9 @@
                                     android:id="@+id/recentlyPlayedTextView4"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:text="TextView"
                                     android:layout_marginTop="3dp"
-                                    android:textStyle="bold"/>
+                                    android:text="TextView"
+                                    android:textStyle="bold" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
@@ -807,9 +805,9 @@
                                     android:id="@+id/recentlyPlayedTextView5"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:text="TextView"
                                     android:layout_marginTop="3dp"
-                                    android:textStyle="bold"/>
+                                    android:text="TextView"
+                                    android:textStyle="bold" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
@@ -835,9 +833,9 @@
                                     android:id="@+id/recentlyPlayedTextView6"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:text="TextView"
                                     android:layout_marginTop="3dp"
-                                    android:textStyle="bold"/>
+                                    android:text="TextView"
+                                    android:textStyle="bold" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
@@ -863,9 +861,9 @@
                                     android:id="@+id/recentlyPlayedTextView7"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:text="TextView"
                                     android:layout_marginTop="3dp"
-                                    android:textStyle="bold"/>
+                                    android:text="TextView"
+                                    android:textStyle="bold" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
@@ -891,9 +889,9 @@
                                     android:id="@+id/recentlyPlayedTextView8"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:text="TextView"
                                     android:layout_marginTop="3dp"
-                                    android:textStyle="bold"/>
+                                    android:text="TextView"
+                                    android:textStyle="bold" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
@@ -920,9 +918,9 @@
                                     android:id="@+id/recentlyPlayedTextView9"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
-                                    android:text="TextView"
                                     android:layout_marginTop="3dp"
-                                    android:textStyle="bold"/>
+                                    android:text="TextView"
+                                    android:textStyle="bold" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
 
@@ -950,8 +948,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="180dp"
                     android:layout_marginTop="40dp"
-                    app:layout_constraintStart_toStartOf="parent"
                     android:scrollbars="none"
+                    app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
 
                     <LinearLayout
@@ -962,10 +960,10 @@
 
                         <androidx.cardview.widget.CardView
                             android:layout_width="160dp"
-                            android:layout_marginLeft="20dp"
                             android:layout_height="match_parent"
-                            app:cardBackgroundColor="@color/CardColor"
-                            android:layout_gravity="center">
+                            android:layout_gravity="center"
+                            android:layout_marginLeft="20dp"
+                            app:cardBackgroundColor="@color/CardColor">
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
@@ -989,12 +987,13 @@
                                     android:textSize="16sp" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:layout_width="160dp"
                             android:layout_height="match_parent"
+                            android:layout_gravity="center"
                             android:layout_marginLeft="15dp"
-                            app:cardBackgroundColor="@color/CardColor"
-                            android:layout_gravity="center">
+                            app:cardBackgroundColor="@color/CardColor">
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
@@ -1018,12 +1017,13 @@
                                     android:textSize="16sp" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:layout_width="160dp"
                             android:layout_height="match_parent"
+                            android:layout_gravity="center"
                             android:layout_marginLeft="15dp"
-                            app:cardBackgroundColor="@color/CardColor"
-                            android:layout_gravity="center">
+                            app:cardBackgroundColor="@color/CardColor">
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
@@ -1047,12 +1047,13 @@
                                     android:textSize="16sp" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:layout_width="160dp"
                             android:layout_height="match_parent"
+                            android:layout_gravity="center"
                             android:layout_marginLeft="15dp"
-                            app:cardBackgroundColor="@color/CardColor"
-                            android:layout_gravity="center">
+                            app:cardBackgroundColor="@color/CardColor">
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
@@ -1076,13 +1077,14 @@
                                     android:textSize="16sp" />
                             </LinearLayout>
                         </androidx.cardview.widget.CardView>
+
                         <androidx.cardview.widget.CardView
                             android:layout_width="160dp"
                             android:layout_height="match_parent"
+                            android:layout_gravity="center"
                             android:layout_marginLeft="15dp"
                             android:layout_marginRight="20dp"
-                            app:cardBackgroundColor="@color/CardColor"
-                            android:layout_gravity="center">
+                            app:cardBackgroundColor="@color/CardColor">
 
                             <LinearLayout
                                 android:layout_width="wrap_content"
@@ -1113,4 +1115,4 @@
         </LinearLayout>
     </ScrollView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>
