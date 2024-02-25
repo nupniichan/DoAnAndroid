@@ -1,6 +1,8 @@
 package com.example.dean;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.documentfile.provider.DocumentFile;
@@ -8,6 +10,14 @@ import androidx.loader.content.CursorLoader;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.google.gson.reflect.TypeToken;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -18,6 +28,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Debug;
@@ -34,6 +45,7 @@ import android.widget.PopupMenu;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.gson.Gson;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -41,7 +53,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class musicListPageActivity extends AppCompatActivity {
 
@@ -49,17 +63,14 @@ public class musicListPageActivity extends AppCompatActivity {
     private MusicAdapter musicAdapter;
     private static final String MUSIC_PREFERENCE = "music_preference";
     private static final String MUSIC_LIST_KEY = "music_list";
+    FirebaseFirestore firestore;
+    FirebaseStorage storage;
+    private StorageReference storageRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_list_page);
-
-        // Xoá dữ liệu (nếu bị lỗi dữ liệu thì hẵn xoá chứ ko thôi lỗi đó)
-/*        SharedPreferences sharedPreferences = getSharedPreferences(MUSIC_PREFERENCE, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.clear();
-        editor.commit();*/
 
         // Khởi tạo RecyclerView và Adapter
         CreateRecyclerViewAndAdapter();
@@ -69,6 +80,9 @@ public class musicListPageActivity extends AppCompatActivity {
 
         // Button quay về lại trang chủ
         CreateHomeButton();
+        firestore = FirebaseFirestore.getInstance();
+        storage = FirebaseStorage.getInstance();
+        storageRef = storage.getReference();
     }
 
     private void CreateHomeButton() {
@@ -89,13 +103,75 @@ public class musicListPageActivity extends AppCompatActivity {
     private void CreateRecyclerViewAndAdapter() {
         musicRecylerView = findViewById(R.id.musicListRecyclerView);
         musicAdapter = new MusicAdapter(this);
+
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, RecyclerView.VERTICAL, false);
         musicRecylerView.setLayoutManager(linearLayoutManager);
 
-        // Lấy danh sách nhạc từ SharedPreferences và cập nhật RecyclerView
-        musicAdapter.SetData(getMusicListFromStorage());
+        // Truy vấn dữ liệu từ Storage và cập nhật Adapter khi có dữ liệu mới
+        getAllAudioFilesFromStorage();
+
         musicRecylerView.setAdapter(musicAdapter);
     }
+
+    private void getAllAudioFilesFromStorage() {
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference().child("audio");
+
+        storageRef.listAll()
+                .addOnSuccessListener(listResult -> {
+                    List<music> musicList = new ArrayList<>();
+
+                    for (StorageReference item : listResult.getItems()) {
+                        // Tạo một đối tượng music từ thông tin của StorageReference
+                        music _music = new music();
+                        _music.setMusicTitle(item.getName());
+                        _music.setFilePath(item.getPath());
+
+                        // Lấy thông tin từ metadata của file
+                        item.getMetadata().addOnSuccessListener(storageMetadata -> {
+                            String audioTitle = storageMetadata.getCustomMetadata("title");
+                            String audioArtist = storageMetadata.getCustomMetadata("artist");
+                            String albumArt = storageMetadata.getCustomMetadata("albumArtUrl");
+
+                            item.getDownloadUrl().addOnSuccessListener(downloadUrl -> {
+                                MediaPlayer mediaPlayer = new MediaPlayer();
+                                try {
+                                    mediaPlayer.setDataSource(downloadUrl.toString());
+                                    mediaPlayer.prepare();
+                                    int durationInMillis = mediaPlayer.getDuration();
+                                    _music.setMusicTitle(audioTitle != null ? audioTitle : item.getName());
+                                    _music.setArtist(audioArtist != null ? audioArtist : "Unknown Artist");
+                                    _music.setMusicLength(durationInMillis);
+                                    _music.setAlbumArtBitmap(albumArt);
+                                    _music.setUriFilePath(downloadUrl.toString());
+
+                                    musicList.add(_music);
+
+                                    // Log để kiểm tra dữ liệu trả về từ Storage
+                                    Log.d("StorageData", "Size: " + musicList.size());
+
+                                    musicAdapter.SetData(musicList);
+
+                                    // Giải phóng MediaPlayer khi đã sử dụng xong
+                                    mediaPlayer.release();
+                                } catch (IOException | IllegalArgumentException | SecurityException e) {
+                                    e.printStackTrace();
+                                    Log.e("StorageData", "Error preparing MediaPlayer: " + e.getMessage());
+                                }
+                            }).addOnFailureListener(e -> {
+                                Log.e("StorageData", "Error getting download URL: " + e.getMessage());
+                            });
+                        }).addOnFailureListener(e -> {
+                            Log.e("StorageData", "Error getting metadata: " + e.getMessage());
+                        });
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("StorageData", "Error: " + e.getMessage());
+                });
+    }
+
+
 
     private List<music> getMusicList() {
         List<music> list = new ArrayList<>();
@@ -122,145 +198,107 @@ public class musicListPageActivity extends AppCompatActivity {
         return true;
     }
 
-    // Khi add file vào xong sẽ xử lý sự kiện là khi lấy xong mình sẽ đạt được gì
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == PICK_AUDIO_REQUEST && resultCode == RESULT_OK) {
-            if (data != null && data.getData() != null) {
-                Uri selectedAudioUri = data.getData();
-                // Sử dụng MediaMetadataRetriever để lấy thông tin chi tiết về tệp âm thanh
-                MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                retriever.setDataSource(this, selectedAudioUri);
-                String filePath = getRealPathFromUri(selectedAudioUri);
+        if (requestCode == PICK_AUDIO_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            Uri audioUri = data.getData();
+            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+            retriever.setDataSource(this, audioUri);
 
-                // Lưu trữ tệp âm thanh MP3 vào bộ nhớ trong ứng dụng
-                String mp3FileName = "audio_" + System.currentTimeMillis() + ".mp3";
-                String mp3FilePath = saveMp3File(selectedAudioUri, mp3FileName);
-                Log.d("mp3FilePath",mp3FilePath);
-                retriever.setDataSource(this, selectedAudioUri);
-                Log.d("filepath", filePath);
+            String audioTitle = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
+            String audioArtist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
 
-                // Lấy thông tin
-                String audioTitle = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-                String audioArtist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
-                String audioDuration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+            // Lấy dữ liệu album art
+            byte[] albumArtBytes = retriever.getEmbeddedPicture();
+            Bitmap albumArtBitmap = BitmapFactory.decodeByteArray(albumArtBytes, 0, albumArtBytes.length);
 
-                // Chuyển đổi đơn vị thời lượng thành milliseconds (vì khi lấy vô nó ở dạng miliseconds)
-                long durationInMillis = Long.parseLong(audioDuration);
+            // Tạo tham chiếu đến Firebase Cloud Storage
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageRef = storage.getReference();
+            String audioFileName = "audio_" + System.currentTimeMillis() + ".mp3"; // Tên tệp tin trên Firebase Cloud Storage
+            StorageReference audioRef = storageRef.child("audio/" + audioFileName);
+            String albumArtFileName = "album_art_" + System.currentTimeMillis() + ".jpg";
+            StorageReference albumArtRef = storageRef.child("images/" + albumArtFileName);
 
-                // Lấy dữ liệu album art
-                byte[] albumArtBytes = retriever.getEmbeddedPicture();
-                Bitmap albumArtBitmap;
-                albumArtBitmap = BitmapFactory.decodeByteArray(albumArtBytes, 0, albumArtBytes.length);
-                String albumArtFilePath = saveAlbumArtToFile(albumArtBitmap, "album_art_" + System.currentTimeMillis() + ".png");
+            // Lưu Bitmap vào Firebase Storage và xử lý sau khi tải lên thành công
+            saveBitmapToFirebaseStorage(albumArtBitmap, albumArtFileName,
+                    taskSnapshot -> {
+                        // Lấy đường dẫn tải xuống của ảnh từ Firebase Storage
+                        albumArtRef.getDownloadUrl().addOnSuccessListener(albumArtDownloadUrl -> {
+                            String albumArtUrl = albumArtDownloadUrl.toString();
 
-                // Thêm tệp âm thanh vào danh sách âm nhạc và lưu trữ vào SharedPreferences
-                List<music> musicList = getMusicListFromStorage();
-                musicList.add(new music(R.drawable.gochiusa, audioTitle, audioArtist, durationInMillis,albumArtFilePath, albumArtBitmap, mp3FilePath ));
-                musicAdapter.SetData(musicList);
-                musicAdapter.notifyDataSetChanged();
+                            StorageMetadata metadata = new StorageMetadata.Builder()
+                                    .setCustomMetadata("title", audioTitle)
+                                    .setCustomMetadata("artist", audioArtist)
+                                    .setCustomMetadata("albumArtUrl", albumArtUrl)
+                                    .build();
 
-                // Lưu trữ danh sách nhạc đã cập nhật vào SharedPreferences
-                Gson gson = new Gson();
-                String updatedJson = gson.toJson(musicList);
-                getSharedPreferences(MUSIC_PREFERENCE, Context.MODE_PRIVATE).edit().putString(MUSIC_LIST_KEY, updatedJson).apply();
-            }
+                            audioRef.putFile(audioUri, metadata)
+                                    .addOnSuccessListener(audioUploadTaskSnapshot -> {
+                                        audioRef.getDownloadUrl().addOnSuccessListener(audioDownloadUrl -> {
+                                            String downloadUrl = audioDownloadUrl.toString();
+                                            saveFilePathAndMetadataToFirestore(downloadUrl);
+                                        });
+                                    })
+                                    .addOnFailureListener(e -> {
+                                    });
+                        });
+                    },
+                    e -> {
+                    });
         }
     }
-    private String getRealPathFromUri(Uri uri) {
-        String filePath = null;
-        DocumentFile documentFile = DocumentFile.fromSingleUri(this, uri);
-        if (documentFile != null) {
-            filePath = documentFile.getUri().getPath();
-        }
-        return filePath;
+
+    private void saveBitmapToFirebaseStorage(Bitmap bitmap, String fileName,
+                                             OnSuccessListener<UploadTask.TaskSnapshot> onSuccessListener,
+                                             OnFailureListener onFailureListener) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference storageRef = storage.getReference();
+        StorageReference imageRef = storageRef.child("images/" + fileName);
+
+        UploadTask uploadTask = imageRef.putBytes(data);
+        uploadTask.addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
     }
-    private String saveAlbumArtToFile(Bitmap albumArtBitmap, String fileName) {
-        ContextWrapper contextWrapper = new ContextWrapper(getApplicationContext());
-        File directory = contextWrapper.getDir("albumArtDir", Context.MODE_PRIVATE);
-        File filePath = new File(directory, fileName);
 
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(filePath);
-            albumArtBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-            fos.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (fos != null) {
-                    fos.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+    private void saveFilePathAndMetadataToFirestore(String downloadUrl) {
+        // Lấy metadata từ StorageReference
+        storageRef.getMetadata().addOnSuccessListener(storageMetadata -> {
+            String title = storageMetadata.getCustomMetadata("title");
+            String artist = storageMetadata.getCustomMetadata("artist");
+            String albumArtUrl = storageMetadata.getCustomMetadata("albumArtUrl");
 
-        return filePath.getAbsolutePath();
-    }
-    private String saveMp3File(Uri audioUri, String fileName) {
-        InputStream inputStream = null;
-        OutputStream outputStream = null;
-        try {
-            // Mở InputStream từ Uri của tệp âm thanh được chọn
-            inputStream = getContentResolver().openInputStream(audioUri);
+            // Tạo một tài liệu mới với các thông tin
+            Map<String, Object> fileData = new HashMap<>();
+            fileData.put("audioPath", downloadUrl);
+            fileData.put("title", title);
+            fileData.put("artist", artist);
+            fileData.put("albumArtUrl", albumArtUrl);
 
-            // Tạo đường dẫn cho tệp âm thanh trong bộ nhớ trong của ứng dụng
-            File directory = getDir("audioDir", Context.MODE_PRIVATE);
-            File filePath = new File(directory, fileName);
-
-            // Mở OutputStream để ghi dữ liệu vào tệp âm thanh
-            outputStream = new FileOutputStream(filePath);
-
-            // Sao chép dữ liệu từ InputStream sang OutputStream
-            byte[] buffer = new byte[1024];
-            int length;
-            while ((length = inputStream.read(buffer)) > 0) {
-                outputStream.write(buffer, 0, length);
+            // Đảm bảo firestore đã được khởi tạo
+            if (firestore == null) {
+                firestore = FirebaseFirestore.getInstance();
             }
 
-            return filePath.getAbsolutePath();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        } finally {
-            try {
-                // Đóng InputStream và OutputStream
-                if (inputStream != null) {
-                    inputStream.close();
-                }
-                if (outputStream != null) {
-                    outputStream.close();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-    @Override
-    protected void onResume() {
-        super.onResume();
-        musicAdapter.SetData(getMusicListFromStorage());
+            // Lưu tài liệu vào Firestore
+            firestore.collection("audioCollection")
+                    .add(fileData)
+                    .addOnSuccessListener(documentReference -> {
+                    })
+                    .addOnFailureListener(e -> {
+                    });
+        }).addOnFailureListener(e -> {
+        });
     }
 
     public void ReturnToHomePage(){
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }
-    private List<music> getMusicListFromStorage() {
-        List<music> list;
-        String json = getSharedPreferences(MUSIC_PREFERENCE, Context.MODE_PRIVATE).getString(MUSIC_LIST_KEY, null);
-        if (json == null) {
-            list = new ArrayList<>();
-        } else {
-            Gson gson = new Gson();
-            Type type = new TypeToken<ArrayList<music>>() {}.getType();
-            list = gson.fromJson(json, type);
-        }
-        return list;
-    }
-
 }

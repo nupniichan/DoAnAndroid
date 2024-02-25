@@ -10,20 +10,21 @@ public class music {
     private String filePath;
 
     private String uriFilePath;
-    private Bitmap albumArtBitmap;
+    private String albumArtBitmap;
 
     public String getFilePath() {
         return filePath;
     }
 
     public String getUriFilePath() { return uriFilePath; }
+    public void setUriFilePath(String uriFilePath) {this.uriFilePath = uriFilePath;}
 
     public void setFilePath(String filePath) {
         this.filePath = filePath;
     }
 
 
-    public music(int resourceId, String musicTitle, String artist, long musicLength,String filePath, Bitmap albumArtBitmap, String uriFilePath){
+    public music(int resourceId, String musicTitle, String artist, long musicLength,String filePath, String albumArtBitmap, String uriFilePath){
         this.resourceId = resourceId;
         this.musicTitle = musicTitle;
         this.artist = artist;
@@ -32,10 +33,12 @@ public class music {
         this.albumArtBitmap = albumArtBitmap;
         this.uriFilePath = uriFilePath;
     }
+    public music(){}
 
-    public Bitmap getAlbumArtBitmap() {
+    public String getAlbumArtBitmap() {
         return albumArtBitmap;
     }
+    public void setAlbumArtBitmap(String albumArtBitmap) {this.albumArtBitmap = albumArtBitmap; }
     public int getResourceId() {
         return resourceId;
     }
@@ -64,7 +67,7 @@ public class music {
         return (int) musicLength;
     }
 
-    public void setMusicLength(int musicLength) {
+    public void setMusicLength(long musicLength) {
         this.musicLength = musicLength;
     }
 }

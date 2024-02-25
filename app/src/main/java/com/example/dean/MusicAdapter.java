@@ -76,14 +76,14 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
         if (_music == null)
             return;
 
-        Bitmap albumArtBitmap = _music.getAlbumArtBitmap();
-        if (albumArtBitmap != null) {
+        String albumArtUrl = _music.getAlbumArtBitmap();
+
+        if (albumArtUrl != null) {
             Glide.with(mContext)
-                    .load(Uri.fromFile(new File(_music.getFilePath())))
+                    .load(albumArtUrl)
                     .error(R.drawable.ic_launcher_background)
                     .into(holder.imgMusic);
         } else {
-            // Nếu ko thì có đặt ảnh mặc định
             holder.imgMusic.setImageResource(R.drawable.ic_launcher_background);
         }
 
@@ -113,7 +113,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
             Intent intent = new Intent(mContext, MusicPlayer.class);
             intent.putExtra("musicName", selectedMusic.getMusicTitle());
             intent.putExtra("artistName", selectedMusic.getArtist());
-            intent.putExtra("albumArtFilePath", selectedMusic.getFilePath());
+            intent.putExtra("albumArtFilePath", selectedMusic.getAlbumArtBitmap());
             intent.putExtra("musicFilePath", selectedMusic.getUriFilePath());
             mContext.startActivity(intent);
         }

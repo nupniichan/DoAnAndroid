@@ -172,11 +172,10 @@ public class MusicPlayer extends AppCompatActivity {
         String getArtistName = intent.getStringExtra("artistName");
         String albumArtFilePath = intent.getStringExtra("albumArtFilePath");
 
-
         // Sử dụng Glide để tải hình ảnh từ đường dẫn file
         Glide.with(this)
                 .asBitmap()
-                .load(Uri.fromFile(new File(albumArtFilePath)))
+                .load(albumArtFilePath)
                 .error(R.drawable.ic_launcher_background)
                 .into(new SimpleTarget<Bitmap>() {
                     @Override
@@ -199,6 +198,7 @@ public class MusicPlayer extends AppCompatActivity {
         songName.setText(getMusicName);
         artistName.setText(getArtistName);
     }
+
 
     private void updateSeekBar() {
         if (mediaPlayer != null && mediaPlayer.isPlaying()) {

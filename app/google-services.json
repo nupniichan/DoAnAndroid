@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "742729668062",
+    "project_id": "doan-de10a",
+    "storage_bucket": "doan-de10a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:742729668062:android:12b83c558fd549a929394f",
+        "android_client_info": {
+          "package_name": "com.example.dean"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDHM1SiXLFOzzCpAJK2NPqYGY-_snVsQ0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
