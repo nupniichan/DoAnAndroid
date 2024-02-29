@@ -6,10 +6,10 @@
         android:id="@+id/search_vector"
         android:icon="@drawable/search_vector"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
-        app:showAsAction="ifRoom|collapseActionView"/>
+        app:showAsAction="always"/>
     <item
         android:title="Addbox"
         android:id="@+id/addboxvector"
         android:icon="@drawable/addbox_vector"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="always"/>
 </menu>

@@ -1,110 +1,77 @@
 package com.example.dean;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.documentfile.provider.DocumentFile;
-import androidx.loader.content.CursorLoader;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageMetadata;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
-import com.google.gson.reflect.TypeToken;
-import android.content.ContentResolver;
-import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Debug;
-import android.provider.DocumentsContract;
-import android.provider.MediaStore;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.PopupMenu;
+import android.view.ViewGroup;
 
-import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.gson.Gson;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
-public class musicListPageActivity extends AppCompatActivity {
+public class musicListPageActivity extends Fragment {
 
     private RecyclerView musicRecylerView;
     private MusicAdapter musicAdapter;
     private static final String MUSIC_PREFERENCE = "music_preference";
     private static final String MUSIC_LIST_KEY = "music_list";
-    FirebaseFirestore firestore;
-    FirebaseStorage storage;
-    private StorageReference storageRef;
+    private static final int PICK_AUDIO_REQUEST = 1;
 
+    FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+    FirebaseStorage storage = FirebaseStorage.getInstance();
+    private StorageReference storageRef = storage.getReference();
+
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_music_list_page);
-
-        // Khởi tạo RecyclerView và Adapter
-        CreateRecyclerViewAndAdapter();
-
-        // Khởi tạo toolBar của trang danh sách nhạc
-        CreateToolBar();
-
-        // Button quay về lại trang chủ
-        CreateHomeButton();
-        firestore = FirebaseFirestore.getInstance();
-        storage = FirebaseStorage.getInstance();
-        storageRef = storage.getReference();
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.activity_music_list_page, container, false);
+        setHasOptionsMenu(true);
+        CreateRecyclerViewAndAdapter(view);
+        CreateToolBar(view);
+        return view;
     }
 
-    private void CreateHomeButton() {
-        Button homeButton = findViewById(R.id.button1);
-        homeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ReturnToHomePage();
-            }
-        });
+    private void CreateToolBar(View view) {
+        Toolbar toolbar = view.findViewById(R.id.musicListPagetoolBar);
+        ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
     }
 
-    private void CreateToolBar() {
-        Toolbar toolbar = findViewById(R.id.musicPageListToolBar);
-        setSupportActionBar(toolbar);
-    }
+    private void CreateRecyclerViewAndAdapter(View view) {
+        musicRecylerView = view.findViewById(R.id.musicListRecyclerView);
 
-    private void CreateRecyclerViewAndAdapter() {
-        musicRecylerView = findViewById(R.id.musicListRecyclerView);
-        musicAdapter = new MusicAdapter(this);
+        musicAdapter = new MusicAdapter(getContext());
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this, RecyclerView.VERTICAL, false);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
         musicRecylerView.setLayoutManager(linearLayoutManager);
 
         // Truy vấn dữ liệu từ Storage và cập nhật Adapter khi có dữ liệu mới
@@ -113,81 +80,13 @@ public class musicListPageActivity extends AppCompatActivity {
         musicRecylerView.setAdapter(musicAdapter);
     }
 
-    private void getAllAudioFilesFromStorage() {
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageRef = storage.getReference().child("audio");
-
-        storageRef.listAll()
-                .addOnSuccessListener(listResult -> {
-                    List<music> musicList = new ArrayList<>();
-
-                    for (StorageReference item : listResult.getItems()) {
-                        // Tạo một đối tượng music từ thông tin của StorageReference
-                        music _music = new music();
-                        _music.setMusicTitle(item.getName());
-                        _music.setFilePath(item.getPath());
-
-                        // Lấy thông tin từ metadata của file
-                        item.getMetadata().addOnSuccessListener(storageMetadata -> {
-                            String audioTitle = storageMetadata.getCustomMetadata("title");
-                            String audioArtist = storageMetadata.getCustomMetadata("artist");
-                            String albumArt = storageMetadata.getCustomMetadata("albumArtUrl");
-
-                            item.getDownloadUrl().addOnSuccessListener(downloadUrl -> {
-                                MediaPlayer mediaPlayer = new MediaPlayer();
-                                try {
-                                    mediaPlayer.setDataSource(downloadUrl.toString());
-                                    mediaPlayer.prepare();
-                                    int durationInMillis = mediaPlayer.getDuration();
-                                    _music.setMusicTitle(audioTitle != null ? audioTitle : item.getName());
-                                    _music.setArtist(audioArtist != null ? audioArtist : "Unknown Artist");
-                                    _music.setMusicLength(durationInMillis);
-                                    _music.setAlbumArtBitmap(albumArt);
-                                    _music.setUriFilePath(downloadUrl.toString());
-
-                                    musicList.add(_music);
-
-                                    // Log để kiểm tra dữ liệu trả về từ Storage
-                                    Log.d("StorageData", "Size: " + musicList.size());
-
-                                    musicAdapter.SetData(musicList);
-
-                                    // Giải phóng MediaPlayer khi đã sử dụng xong
-                                    mediaPlayer.release();
-                                } catch (IOException | IllegalArgumentException | SecurityException e) {
-                                    e.printStackTrace();
-                                    Log.e("StorageData", "Error preparing MediaPlayer: " + e.getMessage());
-                                }
-                            }).addOnFailureListener(e -> {
-                                Log.e("StorageData", "Error getting download URL: " + e.getMessage());
-                            });
-                        }).addOnFailureListener(e -> {
-                            Log.e("StorageData", "Error getting metadata: " + e.getMessage());
-                        });
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("StorageData", "Error: " + e.getMessage());
-                });
-    }
-
-
-
-    private List<music> getMusicList() {
-        List<music> list = new ArrayList<>();
-        return list;
-    }
-    private static final int PICK_AUDIO_REQUEST = 1;
-
-    // Tạo option menu (nghĩa là cái bấm vào rồi nó hiện cái bảng ở dưới ấy)
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.musiclistpage_toolbar,menu);
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.musiclistpage_toolbar, menu);
         MenuItem addBoxItem = menu.findItem(R.id.addboxvector);
         addBoxItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(@NonNull MenuItem item) {
-                // Để người dùng bấm cái phím + để add file vô
                 Intent intent = new Intent();
                 intent.setType("audio/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
@@ -195,17 +94,16 @@ public class musicListPageActivity extends AppCompatActivity {
                 return true;
             }
         });
-        return true;
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == PICK_AUDIO_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+        if (requestCode == PICK_AUDIO_REQUEST && resultCode == android.app.Activity.RESULT_OK && data != null && data.getData() != null) {
             Uri audioUri = data.getData();
             MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-            retriever.setDataSource(this, audioUri);
+            retriever.setDataSource(getContext(), audioUri);
 
             String audioTitle = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
             String audioArtist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
@@ -219,6 +117,7 @@ public class musicListPageActivity extends AppCompatActivity {
             StorageReference storageRef = storage.getReference();
             String audioFileName = "audio_" + System.currentTimeMillis() + ".mp3"; // Tên tệp tin trên Firebase Cloud Storage
             StorageReference audioRef = storageRef.child("audio/" + audioFileName);
+            String musicID = UUID.randomUUID().toString();
             String albumArtFileName = "album_art_" + System.currentTimeMillis() + ".jpg";
             StorageReference albumArtRef = storageRef.child("images/" + albumArtFileName);
 
@@ -230,6 +129,7 @@ public class musicListPageActivity extends AppCompatActivity {
                             String albumArtUrl = albumArtDownloadUrl.toString();
 
                             StorageMetadata metadata = new StorageMetadata.Builder()
+                                    .setCustomMetadata("musicID", musicID)
                                     .setCustomMetadata("title", audioTitle)
                                     .setCustomMetadata("artist", audioArtist)
                                     .setCustomMetadata("albumArtUrl", albumArtUrl)
@@ -270,35 +170,112 @@ public class musicListPageActivity extends AppCompatActivity {
     private void saveFilePathAndMetadataToFirestore(String downloadUrl) {
         // Lấy metadata từ StorageReference
         storageRef.getMetadata().addOnSuccessListener(storageMetadata -> {
+            String musicID = storageMetadata.getCustomMetadata("musicID");
             String title = storageMetadata.getCustomMetadata("title");
             String artist = storageMetadata.getCustomMetadata("artist");
             String albumArtUrl = storageMetadata.getCustomMetadata("albumArtUrl");
 
-            // Tạo một tài liệu mới với các thông tin
-            Map<String, Object> fileData = new HashMap<>();
-            fileData.put("audioPath", downloadUrl);
-            fileData.put("title", title);
-            fileData.put("artist", artist);
-            fileData.put("albumArtUrl", albumArtUrl);
+            // Cập nhật metadata của file trong Firebase Storage
+            storageRef.updateMetadata(new StorageMetadata.Builder()
+                            .setCustomMetadata("audioPath", downloadUrl)
+                            .setCustomMetadata("musicID",musicID)
+                            .setCustomMetadata("title", title)
+                            .setCustomMetadata("musicID", musicID)
+                            .setCustomMetadata("artist", artist)
+                            .setCustomMetadata("albumArtUrl", albumArtUrl)
+                            .build())
+                    .addOnSuccessListener(updatedMetadata -> {
+                        // Cập nhật thành công, tiếp tục lưu vào Firestore
+                        Map<String, Object> fileData = new HashMap<>();
+                        fileData.put("audioPath", downloadUrl);
+                        fileData.put("title", title);
+                        fileData.put("musicID", musicID);
+                        fileData.put("artist", artist);
+                        fileData.put("albumArtUrl", albumArtUrl);
 
-            // Đảm bảo firestore đã được khởi tạo
-            if (firestore == null) {
-                firestore = FirebaseFirestore.getInstance();
-            }
+                        if (firestore == null) {
+                            firestore = FirebaseFirestore.getInstance();
+                        }
 
-            // Lưu tài liệu vào Firestore
-            firestore.collection("audioCollection")
-                    .add(fileData)
-                    .addOnSuccessListener(documentReference -> {
+                        firestore.collection("audioCollection")
+                                .add(fileData)
+                                .addOnSuccessListener(documentReference -> {
+                                    // Xử lý thành công
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Xử lý lỗi khi lưu vào Firestore
+                                });
                     })
                     .addOnFailureListener(e -> {
+                        // Xử lý lỗi khi cập nhật metadata trong Firebase Storage
                     });
         }).addOnFailureListener(e -> {
+            // Xử lý lỗi khi lấy metadata từ Firebase Storage
         });
     }
+    private void getAllAudioFilesFromStorage() {
+        try {
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageRef = storage.getReference().child("audio");
 
-    public void ReturnToHomePage(){
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+            storageRef.listAll()
+                    .addOnSuccessListener(listResult -> {
+                        List<music> musicList = new ArrayList<>();
+
+                        for (StorageReference item : listResult.getItems()) {
+                            // Tạo một đối tượng music từ thông tin của StorageReference
+                            music _music = new music();
+                            _music.setMusicTitle(item.getName());
+                            _music.setFilePath(item.getPath());
+
+                            // Lấy thông tin từ metadata của file
+                            item.getMetadata().addOnSuccessListener(storageMetadata -> {
+                                String audioTitle = storageMetadata.getCustomMetadata("title");
+                                String audioArtist = storageMetadata.getCustomMetadata("artist");
+                                String albumArt = storageMetadata.getCustomMetadata("albumArtUrl");
+                                String musicID = storageMetadata.getCustomMetadata("musicID");
+                                item.getDownloadUrl().addOnSuccessListener(downloadUrl -> {
+                                    MediaPlayer mediaPlayer = new MediaPlayer();
+                                    try {
+                                        mediaPlayer.setDataSource(downloadUrl.toString());
+                                        mediaPlayer.prepare();
+                                        int durationInMillis = mediaPlayer.getDuration();
+                                        _music.setMusicTitle(audioTitle != null ? audioTitle : item.getName());
+                                        _music.setArtist(audioArtist != null ? audioArtist : "Unknown Artist");
+                                        _music.setMusicLength(durationInMillis);
+                                        _music.setAlbumArtBitmap(albumArt);
+                                        _music.setUriFilePath(downloadUrl.toString());
+                                        _music.setResourceId(musicID);
+                                        _music.setFilePath(item.getName());
+                                        musicList.add(_music);
+
+                                        // Log để kiểm tra dữ liệu trả về từ Storage
+                                        Log.d("StorageData", "Size: " + musicList.size());
+
+                                        musicAdapter.SetData(musicList);
+
+                                        // Giải phóng MediaPlayer khi đã sử dụng xong
+                                        mediaPlayer.release();
+                                    } catch (IOException | IllegalArgumentException | SecurityException e) {
+                                        e.printStackTrace();
+                                        Log.e("StorageData", "Error preparing MediaPlayer: " + e.getMessage());
+                                    }
+                                }).addOnFailureListener(e -> {
+                                    Log.e("StorageData", "Error getting download URL: " + e.getMessage());
+                                });
+                            }).addOnFailureListener(e -> {
+                                Log.e("StorageData", "Error getting metadata: " + e.getMessage());
+                            });
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("StorageData", "Error: " + e.getMessage());
+                    });
+        }
+        catch (Exception e){
+            Log.e("error while upload music", e.getMessage());
+        }
+
     }
+
 }

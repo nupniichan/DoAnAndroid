@@ -1,8 +1,11 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Theme.DeAn" parent="Base.Theme.DeAn">
+    <style name="Base.Theme.DeAnNew" parent="Theme.Material3.Dark.NoActionBar">
         <!-- Transparent system bars for edge-to-edge. -->
-        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+        <item name= "android:colorPrimaryDark">@android:color/darker_gray</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">?attr/isLightTheme</item>
     </style>

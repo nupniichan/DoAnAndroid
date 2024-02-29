@@ -2,13 +2,6 @@ package com.example.dean;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.media.MediaMetadataRetriever;
-import android.net.Uri;
-import android.util.Base64;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,10 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.gson.Gson;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.util.List;
 
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHolder> {
@@ -70,6 +60,14 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
                         bottomDialog.dismiss();
                     }
                 });
+                bottomDialog.setOnEditClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        int position = holder.getAdapterPosition();
+                        editMusic(mContext, position);
+                        bottomDialog.dismiss();
+                    }
+                });
                 bottomDialog.show(((AppCompatActivity)mContext).getSupportFragmentManager(),"bottom_dialog");
             }
         });
@@ -100,11 +98,15 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
             musicList.remove(position);
             notifyItemRemoved(position);
             notifyItemRangeChanged(position, musicList.size());
+        }
+    }
+    public void editMusic(Context context, int position) {
+        if (position >= 0 && position < musicList.size()) {
+            music musicToEdit = musicList.get(position);
 
-            // Cập nhật danh sách nhạc đã xoá vào SharedPreferences
-            Gson gson = new Gson();
-            String updatedJson = gson.toJson(musicList);
-            mContext.getSharedPreferences(MUSIC_PREFERENCE, Context.MODE_PRIVATE).edit().putString(MUSIC_LIST_KEY, updatedJson).apply();
+            // Pass the Music object to EditFragment
+            EditFragment editFragment = EditFragment.newInstance(musicToEdit);
+            editFragment.show(((AppCompatActivity) context).getSupportFragmentManager(), "edit_fragment");
         }
     }
     public void playMusic(int position) {

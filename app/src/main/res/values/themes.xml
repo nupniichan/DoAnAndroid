@@ -1,9 +1,11 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.DeAn" parent="Theme.Material3.Dark.NoActionBar">
+    <style name="Base.Theme.DeAnNew" parent="Theme.Material3.Dark.NoActionBar">
         <!-- Customize your light theme here. -->
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
-    <style name="Theme.DeAn" parent="Base.Theme.DeAn" />
+    <style name="Theme.DeAnNew" parent="Base.Theme.DeAnNew" />
 </resources>

@@ -1,9 +1,9 @@
 package com.example.dean;
 
-import android.graphics.Bitmap;
+import java.io.Serializable;
 
-public class music {
-    private int resourceId;
+public class music implements Serializable {
+    private String resourceId;
     private String musicTitle;
     private String artist;
     private long musicLength;
@@ -24,7 +24,7 @@ public class music {
     }
 
 
-    public music(int resourceId, String musicTitle, String artist, long musicLength,String filePath, String albumArtBitmap, String uriFilePath){
+    public music(String resourceId, String musicTitle, String artist, long musicLength,String filePath, String albumArtBitmap, String uriFilePath){
         this.resourceId = resourceId;
         this.musicTitle = musicTitle;
         this.artist = artist;
@@ -39,11 +39,11 @@ public class music {
         return albumArtBitmap;
     }
     public void setAlbumArtBitmap(String albumArtBitmap) {this.albumArtBitmap = albumArtBitmap; }
-    public int getResourceId() {
+    public String getResourceId() {
         return resourceId;
     }
 
-    public void setResourceId(int resourceId) {
+    public void setResourceId(String resourceId) {
         this.resourceId = resourceId;
     }
 

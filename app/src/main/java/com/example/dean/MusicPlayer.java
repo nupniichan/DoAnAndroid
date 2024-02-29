@@ -1,36 +1,27 @@
 package com.example.dean;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.palette.graphics.Palette;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
-import android.graphics.Bitmap;
-import android.net.Uri;
+
 import android.view.View;
 import androidx.core.content.ContextCompat;
-import androidx.palette.graphics.Palette;
+
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.io.File;
 import java.io.IOException;
 
 public class MusicPlayer extends AppCompatActivity {
@@ -186,13 +177,6 @@ public class MusicPlayer extends AppCompatActivity {
                         musicPlayerView.setBackgroundColor(dominantColor);
                         ImageView albumArtImageView = findViewById(R.id.cover_art);
                         albumArtImageView.setImageBitmap(originalBitmap);
-
-                        // Lưu ý: Bạn không cần set layout params khi sử dụng wrap_content cho width và height
-                        // Nếu bạn muốn sử dụng kích thước cố định, bạn có thể sử dụng layout params như sau:
-                        // albumArtImageView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 350));
-
-                        // Hoặc nếu bạn muốn giữ nguyên kích thước theo tỷ lệ khung hình (aspect ratio) và sử dụng fitCenter:
-                        // albumArtImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
                     }
                 });
         songName.setText(getMusicName);
@@ -220,7 +204,14 @@ public class MusicPlayer extends AppCompatActivity {
     }
 
     private void ReturnToMusicListPage(){
-        Intent intent = new Intent(this, musicListPageActivity.class);
-        startActivity(intent);
+        // Kiểm tra xem có Fragment nào trong BackStack hay không
+        int count = getSupportFragmentManager().getBackStackEntryCount();
+        if (count > 0) {
+            // Nếu có Fragment trong BackStack, quay lại Fragment trước đó
+            getSupportFragmentManager().popBackStack();
+        } else {
+            // Nếu không có Fragment trong BackStack, thoát ứng dụng hoặc thực hiện hành động khác
+            super.onBackPressed();
+        }
     }
 }

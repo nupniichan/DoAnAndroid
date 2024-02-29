@@ -20,7 +20,7 @@
             android:orientation="vertical">
 
             <androidx.appcompat.widget.Toolbar
-                android:id="@+id/musicPageListToolBar"
+                android:id="@+id/musicListPagetoolBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@color/black"
@@ -34,32 +34,7 @@
                 android:layout_marginTop="15dp"
                 android:scrollbars="none">
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
 
-                    <Button
-                        android:id="@+id/button1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:backgroundTint="@color/gray"
-                        android:text="Trang Chủ"
-                        android:textColor="@color/white"
-                        app:rippleColor="#FFFFFF" />
-
-                    <Button
-                        android:id="@+id/button2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="5dp"
-                        android:backgroundTint="@color/gray"
-                        android:text="Nhạc"
-                        android:textColor="@color/white"
-                        app:rippleColor="#FFFFFF" />
-
-                </LinearLayout>
             </HorizontalScrollView>
 
             <androidx.recyclerview.widget.RecyclerView
