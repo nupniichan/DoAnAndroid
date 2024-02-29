@@ -40,8 +40,8 @@ public class MusicPlayer extends AppCompatActivity {
         mediaPlayer = new MediaPlayer();
         String musicUri = intent.getStringExtra("musicFilePath");
 
-        CreateTimeLineBar();
         PlayButton(musicUri);
+        CreateTimeLineBar();
         CompletePlaying();
         ReturnToMusicListPageButton();
     }
@@ -111,7 +111,6 @@ public class MusicPlayer extends AppCompatActivity {
             }
         });
     }
-
 
     private void StartPLaying(String musicUri) throws IOException {
         mediaPlayer.setDataSource(musicUri);
