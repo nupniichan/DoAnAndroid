@@ -34,14 +34,18 @@ public class MusicPlayer extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_player);
+        mediaPlayer = new MediaPlayer();
         SetData();
 
         Intent intent = getIntent();
-        mediaPlayer = new MediaPlayer();
         String musicUri = intent.getStringExtra("musicFilePath");
-
-        CreateTimeLineBar();
+        try {
+            PrepareData(musicUri);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         PlayButton(musicUri);
+        CreateTimeLineBar();
         CompletePlaying();
         ReturnToMusicListPageButton();
     }
@@ -85,6 +89,7 @@ public class MusicPlayer extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 ReturnToMusicListPage();
+                mediaPlayer.stop();
             }
         });
     }
@@ -112,11 +117,30 @@ public class MusicPlayer extends AppCompatActivity {
         });
     }
 
-
     private void StartPLaying(String musicUri) throws IOException {
+/*        mediaPlayer.setDataSource(musicUri);
+        mediaPlayer.prepare();
+        mediaPlayer.seekTo(0);
+        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                int totalDuration = mediaPlayer.getDuration();
+                timeLineBar.setMax(totalDuration);
+
+                currentTime.setText(formatDuration(0));
+                duration.setText(formatDuration(totalDuration));
+
+                updateSeekBar();
+            }
+        });*/
+
+        ResumeMusic();
+    }
+
+    private void PrepareData(String musicUri) throws IOException{
         mediaPlayer.setDataSource(musicUri);
         mediaPlayer.prepare();
-
+        mediaPlayer.seekTo(0);
         mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
@@ -129,10 +153,7 @@ public class MusicPlayer extends AppCompatActivity {
                 updateSeekBar();
             }
         });
-
-        ResumeMusic();
     }
-
 
     private void PauseMusic(FloatingActionButton playPauseButton) {
         if (mediaPlayer != null && mediaPlayer.isPlaying()) {

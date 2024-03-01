@@ -20,11 +20,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
@@ -43,8 +45,6 @@ public class musicListPageActivity extends Fragment {
 
     private RecyclerView musicRecylerView;
     private MusicAdapter musicAdapter;
-    private static final String MUSIC_PREFERENCE = "music_preference";
-    private static final String MUSIC_LIST_KEY = "music_list";
     private static final int PICK_AUDIO_REQUEST = 1;
 
     FirebaseFirestore firestore = FirebaseFirestore.getInstance();
@@ -115,7 +115,8 @@ public class musicListPageActivity extends Fragment {
             // Tạo tham chiếu đến Firebase Cloud Storage
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageRef = storage.getReference();
-            String audioFileName = "audio_" + System.currentTimeMillis() + ".mp3"; // Tên tệp tin trên Firebase Cloud Storage
+            /*            String audioFileName = "audio_" + System.currentTimeMillis() + ".mp3"; */
+            String audioFileName = audioTitle + " - "  +System.currentTimeMillis();
             StorageReference audioRef = storageRef.child("audio/" + audioFileName);
             String musicID = UUID.randomUUID().toString();
             String albumArtFileName = "album_art_" + System.currentTimeMillis() + ".jpg";
@@ -138,8 +139,8 @@ public class musicListPageActivity extends Fragment {
                             audioRef.putFile(audioUri, metadata)
                                     .addOnSuccessListener(audioUploadTaskSnapshot -> {
                                         audioRef.getDownloadUrl().addOnSuccessListener(audioDownloadUrl -> {
-                                            String downloadUrl = audioDownloadUrl.toString();
-                                            saveFilePathAndMetadataToFirestore(downloadUrl);
+/*                                            String downloadUrl = audioDownloadUrl.toString();
+                                            saveFilePathAndMetadataToFirestore(downloadUrl);*/
                                         });
                                     })
                                     .addOnFailureListener(e -> {
@@ -167,7 +168,8 @@ public class musicListPageActivity extends Fragment {
                 .addOnFailureListener(onFailureListener);
     }
 
-    private void saveFilePathAndMetadataToFirestore(String downloadUrl) {
+    // Đang kiểm tra lại xem có cần sử dụng không
+    private void saveFilePathAndMetadataToFirestore(View view, String downloadUrl) {
         // Lấy metadata từ StorageReference
         storageRef.getMetadata().addOnSuccessListener(storageMetadata -> {
             String musicID = storageMetadata.getCustomMetadata("musicID");
@@ -201,6 +203,7 @@ public class musicListPageActivity extends Fragment {
                                 .add(fileData)
                                 .addOnSuccessListener(documentReference -> {
                                     // Xử lý thành công
+                                    showSnackbar(view, "Cập nhật thành công");
                                 })
                                 .addOnFailureListener(e -> {
                                     // Xử lý lỗi khi lưu vào Firestore
@@ -275,7 +278,8 @@ public class musicListPageActivity extends Fragment {
         catch (Exception e){
             Log.e("error while upload music", e.getMessage());
         }
-
     }
-
+    private void showSnackbar(View view, String message) {
+        Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show();
+    }
 }
