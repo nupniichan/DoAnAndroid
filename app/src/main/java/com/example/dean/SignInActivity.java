@@ -3,12 +3,14 @@ package com.example.dean;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -111,14 +113,14 @@ public class SignInActivity extends Fragment {
                 .addToBackStack(null)
                 .commit();
 //nếu muốn để sẵn edUsername sau khi SignIn xong
-/*        new Handler().post(new Runnable() {
+        new Handler().post(new Runnable() {
             @Override
             public void run() {
                 TextView edUsernameChange = accountActivity.getView().findViewById(R.id.edUserName);
                 edUsernameChange.setText(edUserNameC.getText().toString().trim());
 
             }
-        });*/
+        });
     }
     private void saveCredentialsToSharedPreferences() {
         String username = edUserNameC.getText().toString().trim();

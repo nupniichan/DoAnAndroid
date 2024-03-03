@@ -1,6 +1,8 @@
 package com.example.dean;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,10 +16,41 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class MainMenuActivity extends Fragment {
+    private RecyclerView musicRecylerView;
+    private RecentlyAddedAdapter musicAdapter;
+    FirebaseStorage storage = FirebaseStorage.getInstance();
+    private StorageReference storageRef = storage.getReference();
+
+    private void CreateRecyclerViewAndAdapter(View view) {
+        musicRecylerView = view.findViewById(R.id.recentlyAddedRecyclerView);
+
+        musicAdapter = new RecentlyAddedAdapter(getContext());
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false);
+        musicRecylerView.setLayoutManager(linearLayoutManager);
+
+        // Truy vấn dữ liệu từ Storage và cập nhật Adapter khi có dữ liệu mới
+        getRecentAudioFilesFromStorage();
+
+        musicRecylerView.setAdapter(musicAdapter);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -26,6 +59,8 @@ public class MainMenuActivity extends Fragment {
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
 
         setHasOptionsMenu(true);
+        CreateRecyclerViewAndAdapter(view);
+
         return view;
     }
 
@@ -51,5 +86,82 @@ public class MainMenuActivity extends Fragment {
         }
         return super.onOptionsItemSelected(item);
     }
+    private void getRecentAudioFilesFromStorage() {
+        try {
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference storageRef = storage.getReference().child("audio");
+
+            storageRef.listAll()
+                    .addOnSuccessListener(listResult -> {
+                        Map<StorageReference, Long> creationTimeMap = new HashMap<>();
+
+                        for (StorageReference item : listResult.getItems()) {
+                            item.getMetadata().addOnSuccessListener(storageMetadata -> {
+                                long creationTime = storageMetadata.getCreationTimeMillis();
+                                creationTimeMap.put(item, creationTime);
+
+                                if (creationTimeMap.size() == listResult.getItems().size()) {
+                                    List<StorageReference> sortedItems = listResult.getItems()
+                                            .stream()
+                                            .sorted(Comparator.comparingLong(creationTimeMap::get).reversed())
+                                            .limit(5)
+                                            .collect(Collectors.toList());
+
+                                    List<music> musicList = new ArrayList<>();
+
+                                    for (StorageReference sortedItem : sortedItems) {
+                                        music _music = new music();
+                                        _music.setMusicTitle(sortedItem.getName());
+                                        _music.setFilePath(sortedItem.getPath());
+
+                                        sortedItem.getMetadata().addOnSuccessListener(sortedItemMetadata -> {
+                                            String audioTitle = sortedItemMetadata.getCustomMetadata("title");
+                                            String audioArtist = sortedItemMetadata.getCustomMetadata("artist");
+                                            String albumArt = sortedItemMetadata.getCustomMetadata("albumArtUrl");
+                                            String musicID = sortedItemMetadata.getCustomMetadata("musicID");
+
+                                            sortedItem.getDownloadUrl().addOnSuccessListener(downloadUrl -> {
+                                                MediaPlayer mediaPlayer = new MediaPlayer();
+                                                try {
+                                                    mediaPlayer.setDataSource(downloadUrl.toString());
+                                                    mediaPlayer.prepare();
+                                                    int durationInMillis = mediaPlayer.getDuration();
+                                                    _music.setMusicTitle(audioTitle != null ? audioTitle : sortedItem.getName());
+                                                    _music.setArtist(audioArtist != null ? audioArtist : "Unknown Artist");
+                                                    _music.setMusicLength(durationInMillis);
+                                                    _music.setAlbumArtBitmap(albumArt);
+                                                    _music.setUriFilePath(downloadUrl.toString());
+                                                    _music.setResourceId(musicID);
+                                                    _music.setFilePath(sortedItem.getName());
+                                                    musicList.add(_music);
+
+                                                    Log.d("StorageData", "Size: " + musicList.size());
+
+                                                    musicAdapter.SetData(musicList);
+
+                                                    mediaPlayer.release();
+                                                } catch (IOException | IllegalArgumentException | SecurityException e) {
+                                                    e.printStackTrace();
+                                                    Log.e("StorageData", "Error preparing MediaPlayer: " + e.getMessage());
+                                                }
+                                            }).addOnFailureListener(e -> {
+                                                Log.e("StorageData", "Error getting download URL: " + e.getMessage());
+                                            });
+                                        }).addOnFailureListener(e -> {
+                                            Log.e("StorageData", "Error getting metadata: " + e.getMessage());
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("StorageData", "Error: " + e.getMessage());
+                    });
+        } catch (Exception e) {
+            Log.e("error while upload music", e.getMessage());
+        }
+    }
+
 }
 
