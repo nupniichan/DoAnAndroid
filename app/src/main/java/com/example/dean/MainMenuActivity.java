@@ -19,35 +19,16 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class MainMenuActivity extends Fragment {
 
-    ImageButton MadeForIB;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_main_menu, container, false);
         Toolbar toolbar = view.findViewById(R.id.toolbar);
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
 
-        /*MadeForIB = view.findViewById(R.id.MadeForYouImageView);
-        MadeForIB.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Load the MusicPlayer fragment
-                loadMusicPlayerFragment();
-            }
-        });*/
-
         setHasOptionsMenu(true);
         return view;
     }
 
-/*    private void loadMusicPlayerFragment() {
-        // Replace the current fragment with the MusicPlayer fragment
-        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, new MusicPlayer())
-                .addToBackStack(null)
-                .commit();
-    }*/
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {

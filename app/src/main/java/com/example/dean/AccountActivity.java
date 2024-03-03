@@ -1,6 +1,7 @@
 package com.example.dean;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -31,12 +32,10 @@ public class AccountActivity extends Fragment {
         edPasswordC = view.findViewById(R.id.edPassword);
         btnLoginC = view.findViewById(R.id.btLogin);
         TextView tvSignUp = view.findViewById(R.id.tvSignUp);
+
         tvSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Handle the click event to navigate to SignUpActivity or SignUpFragment
-                // You can use Intent or FragmentTransaction here
-                // Example for FragmentTransaction:
                 FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
                 transaction.replace(R.id.fragment_container, new SignInActivity());
                 transaction.addToBackStack(null);
@@ -59,10 +58,25 @@ public class AccountActivity extends Fragment {
             public void onClick(View view) {
                 BottomNavigationView bottomNavigationView = requireActivity().findViewById(R.id.bottom_navigation);
                 bottomNavigationView.setVisibility(View.VISIBLE);
-                FragmentTransaction transaction = getParentFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment_container, new MainMenuActivity());
-                transaction.addToBackStack(null);
-                transaction.commit();
+
+                // Kiểm tra quyền truy cập và chuyển hướng tương ứng
+                SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("Credentials", Context.MODE_PRIVATE);
+                boolean isAdmin = sharedPreferences.getBoolean("isAdmin", false);
+
+                if (isAdmin) {
+                    AdminMainMenuFragment managerFragment = new AdminMainMenuFragment();
+                    getParentFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, managerFragment)
+                            .addToBackStack(null)
+                            .commit();
+                } else {
+                    // Nếu là user thường, chuyển hướng đến MainMenuFragment
+                    MainMenuActivity mainMenuFragment = new MainMenuActivity();
+                    getParentFragmentManager().beginTransaction()
+                            .replace(R.id.fragment_container, mainMenuFragment)
+                            .addToBackStack(null)
+                            .commit();
+                }
             }
         });
 
@@ -98,18 +112,28 @@ public class AccountActivity extends Fragment {
         String username = edUsernameC.getText().toString().trim();
         String password = edPasswordC.getText().toString().trim();
 
-        // Proceed with login logic
-        // For example, navigate to the next fragment with user information
-        AccountInfoActivity accountInfoActivity = new AccountInfoActivity();
-        Bundle bundle = new Bundle();
-        bundle.putString("username", username);
-        bundle.putString("password", password);
-        accountInfoActivity.setArguments(bundle);
+        boolean isAdmin = "admin".equals(username) && "admin".equals(password);
 
-        requireActivity().getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, accountInfoActivity)
-                .addToBackStack(null)
-                .commit();
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("Credentials", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("username", username);
+        editor.putString("password", password);
+        editor.putBoolean("isAdmin", isAdmin);
+        editor.apply();
+
+        if (isAdmin) {
+            AdminMainMenuFragment adminMenuFragment = new AdminMainMenuFragment();
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, adminMenuFragment)
+                    .addToBackStack(null)
+                    .commit();
+        } else {
+            // Nếu là user thường, chuyển hướng đến MainMenuFragment
+            MainMenuActivity mainMenuFragment = new MainMenuActivity();
+            getParentFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, mainMenuFragment)
+                    .addToBackStack(null)
+                    .commit();
+        }
     }
-
 }
