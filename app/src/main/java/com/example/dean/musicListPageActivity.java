@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -115,7 +116,6 @@ public class musicListPageActivity extends Fragment {
             // Tạo tham chiếu đến Firebase Cloud Storage
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageRef = storage.getReference();
-            /*            String audioFileName = "audio_" + System.currentTimeMillis() + ".mp3"; */
             String audioFileName = audioTitle + " - "  +System.currentTimeMillis();
             StorageReference audioRef = storageRef.child("audio/" + audioFileName);
             String musicID = UUID.randomUUID().toString();
@@ -125,7 +125,6 @@ public class musicListPageActivity extends Fragment {
             // Lưu Bitmap vào Firebase Storage và xử lý sau khi tải lên thành công
             saveBitmapToFirebaseStorage(albumArtBitmap, albumArtFileName,
                     taskSnapshot -> {
-                        // Lấy đường dẫn tải xuống của ảnh từ Firebase Storage
                         albumArtRef.getDownloadUrl().addOnSuccessListener(albumArtDownloadUrl -> {
                             String albumArtUrl = albumArtDownloadUrl.toString();
 
@@ -141,9 +140,11 @@ public class musicListPageActivity extends Fragment {
                                         audioRef.getDownloadUrl().addOnSuccessListener(audioDownloadUrl -> {
 /*                                            String downloadUrl = audioDownloadUrl.toString();
                                             saveFilePathAndMetadataToFirestore(downloadUrl);*/
+                                            showToast("Thêm thành công!");
                                         });
                                     })
                                     .addOnFailureListener(e -> {
+                                        showToast("Đã xảy ra lỗi khi thêm bài hát");
                                     });
                         });
                     },
@@ -168,54 +169,6 @@ public class musicListPageActivity extends Fragment {
                 .addOnFailureListener(onFailureListener);
     }
 
-    // Đang kiểm tra lại xem có cần sử dụng không
-    private void saveFilePathAndMetadataToFirestore(View view, String downloadUrl) {
-        // Lấy metadata từ StorageReference
-        storageRef.getMetadata().addOnSuccessListener(storageMetadata -> {
-            String musicID = storageMetadata.getCustomMetadata("musicID");
-            String title = storageMetadata.getCustomMetadata("title");
-            String artist = storageMetadata.getCustomMetadata("artist");
-            String albumArtUrl = storageMetadata.getCustomMetadata("albumArtUrl");
-
-            // Cập nhật metadata của file trong Firebase Storage
-            storageRef.updateMetadata(new StorageMetadata.Builder()
-                            .setCustomMetadata("audioPath", downloadUrl)
-                            .setCustomMetadata("musicID",musicID)
-                            .setCustomMetadata("title", title)
-                            .setCustomMetadata("musicID", musicID)
-                            .setCustomMetadata("artist", artist)
-                            .setCustomMetadata("albumArtUrl", albumArtUrl)
-                            .build())
-                    .addOnSuccessListener(updatedMetadata -> {
-                        // Cập nhật thành công, tiếp tục lưu vào Firestore
-                        Map<String, Object> fileData = new HashMap<>();
-                        fileData.put("audioPath", downloadUrl);
-                        fileData.put("title", title);
-                        fileData.put("musicID", musicID);
-                        fileData.put("artist", artist);
-                        fileData.put("albumArtUrl", albumArtUrl);
-
-                        if (firestore == null) {
-                            firestore = FirebaseFirestore.getInstance();
-                        }
-
-                        firestore.collection("audioCollection")
-                                .add(fileData)
-                                .addOnSuccessListener(documentReference -> {
-                                    // Xử lý thành công
-                                    showSnackbar(view, "Cập nhật thành công");
-                                })
-                                .addOnFailureListener(e -> {
-                                    // Xử lý lỗi khi lưu vào Firestore
-                                });
-                    })
-                    .addOnFailureListener(e -> {
-                        // Xử lý lỗi khi cập nhật metadata trong Firebase Storage
-                    });
-        }).addOnFailureListener(e -> {
-            // Xử lý lỗi khi lấy metadata từ Firebase Storage
-        });
-    }
     private void getAllAudioFilesFromStorage() {
         try {
             FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -279,7 +232,7 @@ public class musicListPageActivity extends Fragment {
             Log.e("error while upload music", e.getMessage());
         }
     }
-    private void showSnackbar(View view, String message) {
-        Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show();
+    private void showToast(String message) {
+        Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
     }
 }

@@ -93,18 +93,18 @@ public class MainMenuActivity extends Fragment {
 
             storageRef.listAll()
                     .addOnSuccessListener(listResult -> {
-                        Map<StorageReference, Long> creationTimeMap = new HashMap<>();
+                        Map<StorageReference, Long> lastModifiedTimeMap = new HashMap<>();
 
                         for (StorageReference item : listResult.getItems()) {
                             item.getMetadata().addOnSuccessListener(storageMetadata -> {
-                                long creationTime = storageMetadata.getCreationTimeMillis();
-                                creationTimeMap.put(item, creationTime);
+                                long lastModifiedTime = storageMetadata.getUpdatedTimeMillis(); // Thay đổi từ getCreationTimeMillis()
+                                lastModifiedTimeMap.put(item, lastModifiedTime);
 
-                                if (creationTimeMap.size() == listResult.getItems().size()) {
+                                if (lastModifiedTimeMap.size() == listResult.getItems().size()) {
                                     List<StorageReference> sortedItems = listResult.getItems()
                                             .stream()
-                                            .sorted(Comparator.comparingLong(creationTimeMap::get).reversed())
-                                            .limit(5)
+                                            .sorted(Comparator.comparingLong(lastModifiedTimeMap::get).reversed())
+                                            .limit(3)  // Chỉ lấy 3 tệp mới nhất
                                             .collect(Collectors.toList());
 
                                     List<music> musicList = new ArrayList<>();
@@ -162,6 +162,7 @@ public class MainMenuActivity extends Fragment {
             Log.e("error while upload music", e.getMessage());
         }
     }
+
 
 }
 

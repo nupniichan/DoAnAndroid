@@ -53,7 +53,6 @@ public class AdminMainMenuFragment extends Fragment {
     private MusicAdapter musicAdapter;
     private static final int PICK_AUDIO_REQUEST = 1;
 
-    FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     FirebaseStorage storage = FirebaseStorage.getInstance();
     private StorageReference storageRef = storage.getReference();
 
@@ -74,11 +73,26 @@ public class AdminMainMenuFragment extends Fragment {
                 fragmentTransaction.commit();
             }
         });
+        Button btnAdminReload = view.findViewById(R.id.btnAdminReload);
+        btnAdminReload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Gọi phương thức để reload fragment
+                reloadFragment();
+            }
+        });
         CreateRecyclerViewAndAdapter(view);
         CreateToolBar(view);
         return view;
     }
-
+    private void reloadFragment() {
+        AdminMainMenuFragment adminMainMenuFragment = new AdminMainMenuFragment();
+        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, adminMainMenuFragment);
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
     private void CreateToolBar(View view) {
         Toolbar toolbar = view.findViewById(R.id.musicListPagetoolBar);
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
@@ -119,11 +133,18 @@ public class AdminMainMenuFragment extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                filterDataFromFirebase(query);
                 return false;
             }
-
             @Override
             public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+        });
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                getAllAudioFilesFromStorage();
                 return false;
             }
         });
@@ -206,54 +227,6 @@ public class AdminMainMenuFragment extends Fragment {
                 .addOnFailureListener(onFailureListener);
     }
 
-    // Đang kiểm tra lại xem có cần sử dụng không
-    private void saveFilePathAndMetadataToFirestore(View view, String downloadUrl) {
-        // Lấy metadata từ StorageReference
-        storageRef.getMetadata().addOnSuccessListener(storageMetadata -> {
-            String musicID = storageMetadata.getCustomMetadata("musicID");
-            String title = storageMetadata.getCustomMetadata("title");
-            String artist = storageMetadata.getCustomMetadata("artist");
-            String albumArtUrl = storageMetadata.getCustomMetadata("albumArtUrl");
-
-            // Cập nhật metadata của file trong Firebase Storage
-            storageRef.updateMetadata(new StorageMetadata.Builder()
-                            .setCustomMetadata("audioPath", downloadUrl)
-                            .setCustomMetadata("musicID",musicID)
-                            .setCustomMetadata("title", title)
-                            .setCustomMetadata("musicID", musicID)
-                            .setCustomMetadata("artist", artist)
-                            .setCustomMetadata("albumArtUrl", albumArtUrl)
-                            .build())
-                    .addOnSuccessListener(updatedMetadata -> {
-                        // Cập nhật thành công, tiếp tục lưu vào Firestore
-                        Map<String, Object> fileData = new HashMap<>();
-                        fileData.put("audioPath", downloadUrl);
-                        fileData.put("title", title);
-                        fileData.put("musicID", musicID);
-                        fileData.put("artist", artist);
-                        fileData.put("albumArtUrl", albumArtUrl);
-
-                        if (firestore == null) {
-                            firestore = FirebaseFirestore.getInstance();
-                        }
-
-                        firestore.collection("audioCollection")
-                                .add(fileData)
-                                .addOnSuccessListener(documentReference -> {
-                                    // Xử lý thành công
-                                    showSnackbar(view, "Cập nhật thành công");
-                                })
-                                .addOnFailureListener(e -> {
-                                    // Xử lý lỗi khi lưu vào Firestore
-                                });
-                    })
-                    .addOnFailureListener(e -> {
-                        // Xử lý lỗi khi cập nhật metadata trong Firebase Storage
-                    });
-        }).addOnFailureListener(e -> {
-            // Xử lý lỗi khi lấy metadata từ Firebase Storage
-        });
-    }
     private void getAllAudioFilesFromStorage() {
         try {
             FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -317,7 +290,19 @@ public class AdminMainMenuFragment extends Fragment {
             Log.e("error while upload music", e.getMessage());
         }
     }
-    private void showSnackbar(View view, String message) {
-        Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show();
+
+    private void filterDataFromFirebase(String searchText) {
+        // Tạo danh sách mới để chứa dữ liệu lọc
+        List<music> filteredMusicList = new ArrayList<>();
+
+        // Lọc dữ liệu dựa trên searchText
+        for (music musicItem : musicAdapter.getData()) {
+            if (musicItem.getMusicTitle().toLowerCase().contains(searchText.toLowerCase())) {
+                filteredMusicList.add(musicItem);
+            }
+        }
+
+        // Cập nhật RecyclerView với danh sách dữ liệu lọc
+        musicAdapter.SetData(filteredMusicList);
     }
 }

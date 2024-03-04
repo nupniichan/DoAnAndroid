@@ -48,6 +48,13 @@
                 android:backgroundTint="#FFFFFF"
                 android:text="Quay về trang user" />
 
+            <Button
+                android:id="@+id/btnAdminReload"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#FFFFFF"
+                android:text="Reload trang" />
+
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

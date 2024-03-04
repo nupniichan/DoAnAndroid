@@ -123,6 +123,9 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
             mContext.startActivity(intent);
         }
     }
+    public List<music> getData() {
+        return musicList;
+    }
     @Override
     public int getItemCount() {
         if (musicList != null){
