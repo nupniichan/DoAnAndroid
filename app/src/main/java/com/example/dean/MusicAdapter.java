@@ -15,15 +15,15 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.List;
 
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHolder> {
     private Context mContext;
-    private CardView cardView;
     private List<music> musicList;
-    private static final String MUSIC_PREFERENCE = "music_preference";
-    private static final String MUSIC_LIST_KEY = "music_list";
+
     public MusicAdapter(Context mContext) {
         this.mContext = mContext;
     }
@@ -47,14 +47,15 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
             @Override
             public void onClick(View v) {
                 MusicOptionsBottomSheet bottomDialog = new MusicOptionsBottomSheet();
-                bottomDialog.setPlayClickListener(new View.OnClickListener() {
+                bottomDialog.setOnEditClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(View v) {
+                    public void onClick(View view) {
                         int position = holder.getAdapterPosition();
-                        playMusic(position);
+                        editMusic(mContext, position);
                         bottomDialog.dismiss();
                     }
                 });
+
                 bottomDialog.setOnDeleteClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -63,11 +64,12 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
                         bottomDialog.dismiss();
                     }
                 });
-                bottomDialog.setOnEditClickListener(new View.OnClickListener() {
+
+                bottomDialog.setPlayClickListener(new View.OnClickListener() {
                     @Override
-                    public void onClick(View view) {
+                    public void onClick(View v) {
                         int position = holder.getAdapterPosition();
-                        editMusic(mContext, position);
+                        playMusic(position);
                         bottomDialog.dismiss();
                     }
                 });
@@ -90,24 +92,27 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
 
         holder.musicTitle.setText(_music.getMusicTitle());
         holder.artistName.setText(_music.getArtist());
+        holder.musicTitle.setSelected(true);
+        holder.artistName.setSelected(true);
+        holder.musicTitle.setMaxLines(1);
+        holder.artistName.setMaxLines(1);
         int musicLengthInMillis = (int)_music.getMusicLength();
         int seconds = (int) (musicLengthInMillis / 1000) % 60;
         int minutes = (int) ((musicLengthInMillis / (1000 * 60)) % 60);
         holder.musicLength.setText(String.format("%02d:%02d", minutes, seconds));
     }
 
-    public void removeMusic(int position) {
+    private void removeMusic(int position) {
         if (position >= 0 && position < musicList.size()) {
-            musicList.remove(position);
-            notifyItemRemoved(position);
-            notifyItemRangeChanged(position, musicList.size());
+            music musicToRemove = musicList.get(position);
+            RemoveFragment removeMusicFragment = new RemoveFragment(musicToRemove);
+            removeMusicFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "remove_music");
         }
     }
     public void editMusic(Context context, int position) {
         if (position >= 0 && position < musicList.size()) {
             music musicToEdit = musicList.get(position);
 
-            // Pass the Music object to EditFragment
             EditFragment editFragment = EditFragment.newInstance(musicToEdit);
             editFragment.show(((AppCompatActivity) context).getSupportFragmentManager(), "edit_fragment");
         }

@@ -32,19 +32,19 @@ public class MusicOptionsBottomSheet extends BottomSheetDialogFragment {
         editClickListener = listener;
     }
     private void setupCardViews(View view) {
-        CardView deleteCardView = view.findViewById(R.id.musicOptionRemove);
-
-        if (deleteCardView != null && deleteClickListener != null) {
-            deleteCardView.setOnClickListener(deleteClickListener);
-        }
-
         CardView playMusicCardView = view.findViewById(R.id.playMusicCardView);
         if (playMusicCardView != null && playClickListener != null){
             playMusicCardView.setOnClickListener(playClickListener);
         }
+
         CardView editMusicCardView = view.findViewById(R.id.editMusicCardView);
-        if (editMusicCardView != null && playClickListener != null){
+        if (editMusicCardView != null && editClickListener != null){
             editMusicCardView.setOnClickListener(editClickListener);
+        }
+
+        CardView deleteCardView = view.findViewById(R.id.removeMusicCardView);
+        if (deleteCardView != null && deleteClickListener != null) {
+            deleteCardView.setOnClickListener(deleteClickListener);
         }
     }
 }

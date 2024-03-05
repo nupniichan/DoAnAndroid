@@ -17,7 +17,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 
-public class EditFragment extends DialogFragment {
+    public class EditFragment extends DialogFragment {
 
     private EditText editMusicName;
     private EditText editAuthorName;
@@ -52,16 +52,16 @@ public class EditFragment extends DialogFragment {
         editMusicName = view.findViewById(R.id.editTitle);
         editAuthorName = view.findViewById(R.id.editArtist);
 
-        // Đặt giá trị cho EditText từ đối tượng music hiện tại
         editMusicName.setHint(musicToEdit.getMusicTitle());
         editAuthorName.setHint(musicToEdit.getArtist());
 
-        saveButton = view.findViewById(R.id.btnSave);
+        saveButton = view.findViewById(R.id.btnRemoveConfirm);
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onSaveButtonClicked(view);
+                dismiss();
             }
         });
 
@@ -76,19 +76,15 @@ public class EditFragment extends DialogFragment {
         String newArtist = editAuthorName.getText().toString();
         String musicFileName = musicToEdit.getFilePath();
 
-        // Create a reference to the file in Cloud Storage
         StorageReference fileRef = storageRef.child("audio/" + musicFileName);
 
-        // Get current metadata
         fileRef.getMetadata()
                 .addOnSuccessListener(storageMetadata -> {
-                    // Update metadata with new values
                     StorageMetadata updatedMetadata = new StorageMetadata.Builder()
                             .setCustomMetadata("title", newTitle.isEmpty() ? storageMetadata.getCustomMetadata("title") : newTitle)
                             .setCustomMetadata("artist", newArtist.isEmpty() ? storageMetadata.getCustomMetadata("artist") : newArtist)
                             .build();
 
-                    // Update the metadata
                     fileRef.updateMetadata(updatedMetadata)
                             .addOnSuccessListener(updatedStorageMetadata -> {
                                 showSnackbar(view, "Cập nhật thành công");

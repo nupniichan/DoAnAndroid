@@ -53,9 +53,6 @@ public class AdminMainMenuFragment extends Fragment {
     private MusicAdapter musicAdapter;
     private static final int PICK_AUDIO_REQUEST = 1;
 
-    FirebaseStorage storage = FirebaseStorage.getInstance();
-    private StorageReference storageRef = storage.getReference();
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -171,10 +168,8 @@ public class AdminMainMenuFragment extends Fragment {
             byte[] albumArtBytes = retriever.getEmbeddedPicture();
             Bitmap albumArtBitmap = BitmapFactory.decodeByteArray(albumArtBytes, 0, albumArtBytes.length);
 
-            // Tạo tham chiếu đến Firebase Cloud Storage
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageRef = storage.getReference();
-            /*            String audioFileName = "audio_" + System.currentTimeMillis() + ".mp3"; */
             String audioFileName = audioTitle + " - "  +System.currentTimeMillis();
             StorageReference audioRef = storageRef.child("audio/" + audioFileName);
             String musicID = UUID.randomUUID().toString();
@@ -184,7 +179,6 @@ public class AdminMainMenuFragment extends Fragment {
             // Lưu Bitmap vào Firebase Storage và xử lý sau khi tải lên thành công
             saveBitmapToFirebaseStorage(albumArtBitmap, albumArtFileName,
                     taskSnapshot -> {
-                        // Lấy đường dẫn tải xuống của ảnh từ Firebase Storage
                         albumArtRef.getDownloadUrl().addOnSuccessListener(albumArtDownloadUrl -> {
                             String albumArtUrl = albumArtDownloadUrl.toString();
 

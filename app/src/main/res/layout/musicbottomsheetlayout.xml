@@ -197,7 +197,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:cardElevation="0dp"
-                android:id="@+id/musicOptionRemove"
+                android:id="@+id/removeMusicCardView"
                 app:cardBackgroundColor="@android:color/transparent"
                 android:layout_marginTop="15dp">
 
