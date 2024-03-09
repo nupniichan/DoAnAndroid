@@ -28,19 +28,33 @@
                 app:popupTheme="@style/Theme.AppCompat.Light"
                 app:title="Danh sách nhạc" />
 
+            g
+
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="5dp"
                 android:scrollbars="none">
 
 
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/musicListRecyclerView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent">
+
+                </androidx.recyclerview.widget.RecyclerView>
             </HorizontalScrollView>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/musicListRecyclerView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+            <ProgressBar
+                android:id="@+id/adminLoadingProgressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center"
+                android:outlineAmbientShadowColor="#F4F4F4"
+                android:outlineSpotShadowColor="#FFFFFF"
+                android:visibility="gone" />
 
         </LinearLayout>
     </ScrollView>

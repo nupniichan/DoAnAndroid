@@ -27,11 +27,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
@@ -40,9 +39,7 @@ import com.google.firebase.storage.UploadTask;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 
@@ -52,30 +49,30 @@ public class AdminMainMenuFragment extends Fragment {
     private RecyclerView musicRecylerView;
     private MusicAdapter musicAdapter;
     private static final int PICK_AUDIO_REQUEST = 1;
+    private ProgressBar loadingProgressBar;
+
+    private List<music> allMusicList = new ArrayList<>();
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_admin_main_menu, container, false);
         setHasOptionsMenu(true);
+        loadingProgressBar = view.findViewById(R.id.adminLoadingProgressBar);
         backToUserMenu = view.findViewById(R.id.btnBackToUserMenu);
         backToUserMenu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MainMenuActivity mainMenuFragment = new MainMenuActivity();
-                FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.fragment_container, mainMenuFragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
+                Intent intent = new Intent(requireContext(), MainActivity.class);
+                startActivity(intent);
             }
         });
         Button btnAdminReload = view.findViewById(R.id.btnAdminReload);
         btnAdminReload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Gọi phương thức để reload fragment
                 reloadFragment();
+                requireActivity().finish();
             }
         });
         CreateRecyclerViewAndAdapter(view);
@@ -103,7 +100,6 @@ public class AdminMainMenuFragment extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.VERTICAL, false);
         musicRecylerView.setLayoutManager(linearLayoutManager);
 
-        // Truy vấn dữ liệu từ Storage và cập nhật Adapter khi có dữ liệu mới
         getAllAudioFilesFromStorage();
 
         musicRecylerView.setAdapter(musicAdapter);
@@ -130,18 +126,18 @@ public class AdminMainMenuFragment extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                filterDataFromFirebase(query);
+                _filterDataFromFirebase(query);
                 return false;
             }
             @Override
             public boolean onQueryTextChange(String newText) {
+                filterDataFromFirebase(newText);
                 return false;
             }
         });
         searchView.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
             public boolean onClose() {
-                getAllAudioFilesFromStorage();
                 return false;
             }
         });
@@ -223,25 +219,28 @@ public class AdminMainMenuFragment extends Fragment {
 
     private void getAllAudioFilesFromStorage() {
         try {
+            loadingProgressBar.setVisibility(View.VISIBLE);
+
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageRef = storage.getReference().child("audio");
 
             storageRef.listAll()
                     .addOnSuccessListener(listResult -> {
+                        allMusicList.clear();
+
                         List<music> musicList = new ArrayList<>();
 
                         for (StorageReference item : listResult.getItems()) {
-                            // Tạo một đối tượng music từ thông tin của StorageReference
                             music _music = new music();
                             _music.setMusicTitle(item.getName());
                             _music.setFilePath(item.getPath());
 
-                            // Lấy thông tin từ metadata của file
                             item.getMetadata().addOnSuccessListener(storageMetadata -> {
                                 String audioTitle = storageMetadata.getCustomMetadata("title");
                                 String audioArtist = storageMetadata.getCustomMetadata("artist");
                                 String albumArt = storageMetadata.getCustomMetadata("albumArtUrl");
                                 String musicID = storageMetadata.getCustomMetadata("musicID");
+
                                 item.getDownloadUrl().addOnSuccessListener(downloadUrl -> {
                                     MediaPlayer mediaPlayer = new MediaPlayer();
                                     try {
@@ -257,46 +256,64 @@ public class AdminMainMenuFragment extends Fragment {
                                         _music.setFilePath(item.getName());
                                         musicList.add(_music);
 
-                                        // Log để kiểm tra dữ liệu trả về từ Storage
                                         Log.d("StorageData", "Size: " + musicList.size());
 
                                         musicAdapter.SetData(musicList);
+                                        loadingProgressBar.setVisibility(View.GONE);
 
-                                        // Giải phóng MediaPlayer khi đã sử dụng xong
                                         mediaPlayer.release();
                                     } catch (IOException | IllegalArgumentException | SecurityException e) {
                                         e.printStackTrace();
                                         Log.e("StorageData", "Error preparing MediaPlayer: " + e.getMessage());
+                                        loadingProgressBar.setVisibility(View.GONE);
                                     }
                                 }).addOnFailureListener(e -> {
                                     Log.e("StorageData", "Error getting download URL: " + e.getMessage());
+                                    loadingProgressBar.setVisibility(View.GONE);
                                 });
                             }).addOnFailureListener(e -> {
                                 Log.e("StorageData", "Error getting metadata: " + e.getMessage());
+                                loadingProgressBar.setVisibility(View.GONE);
                             });
                         }
                     })
                     .addOnFailureListener(e -> {
                         Log.e("StorageData", "Error: " + e.getMessage());
+                        loadingProgressBar.setVisibility(View.GONE);
                     });
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             Log.e("error while upload music", e.getMessage());
+            loadingProgressBar.setVisibility(View.GONE);
         }
     }
 
     private void filterDataFromFirebase(String searchText) {
         // Tạo danh sách mới để chứa dữ liệu lọc
         List<music> filteredMusicList = new ArrayList<>();
-
-        // Lọc dữ liệu dựa trên searchText
-        for (music musicItem : musicAdapter.getData()) {
-            if (musicItem.getMusicTitle().toLowerCase().contains(searchText.toLowerCase())) {
-                filteredMusicList.add(musicItem);
+        if (searchText.length() < 1) {
+            getAllAudioFilesFromStorage();
+            filteredMusicList.addAll(musicAdapter.getData());
+        } else {
+            for (music musicItem : musicAdapter.getData()) {
+                if (Utils.containsAllChars(musicItem.getMusicTitle().toLowerCase(),searchText.toLowerCase())) {
+                    filteredMusicList.add(musicItem);
+                }
             }
         }
-
-        // Cập nhật RecyclerView với danh sách dữ liệu lọc
         musicAdapter.SetData(filteredMusicList);
+    }
+    private void _filterDataFromFirebase(String searchText){
+        List<music> filteredMusicList = new ArrayList<>();
+        if (searchText.length() < 1) {
+            getAllAudioFilesFromStorage();
+            filteredMusicList.addAll(musicAdapter.getData());
+        }
+        else {
+            for (music musicItem : musicAdapter.getData()) {
+                if (musicItem.getMusicTitle().toLowerCase().contains(searchText.toLowerCase())) {
+                    filteredMusicList.add(musicItem);
+                }
+            }
+        }
     }
 }

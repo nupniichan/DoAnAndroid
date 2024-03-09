@@ -36,7 +36,6 @@ public class MainMenuActivity extends Fragment {
     private RecyclerView musicRecylerView;
     private RecentlyAddedAdapter musicAdapter;
     FirebaseStorage storage = FirebaseStorage.getInstance();
-    private StorageReference storageRef = storage.getReference();
 
     private void CreateRecyclerViewAndAdapter(View view) {
         musicRecylerView = view.findViewById(R.id.recentlyAddedRecyclerView);
@@ -46,7 +45,6 @@ public class MainMenuActivity extends Fragment {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext(), RecyclerView.HORIZONTAL, false);
         musicRecylerView.setLayoutManager(linearLayoutManager);
 
-        // Truy vấn dữ liệu từ Storage và cập nhật Adapter khi có dữ liệu mới
         getRecentAudioFilesFromStorage();
 
         musicRecylerView.setAdapter(musicAdapter);
@@ -162,7 +160,5 @@ public class MainMenuActivity extends Fragment {
             Log.e("error while upload music", e.getMessage());
         }
     }
-
-
 }
 

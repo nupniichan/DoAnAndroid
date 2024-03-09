@@ -29,9 +29,6 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.Library:
                         loadFragment(new musicListPageActivity());
                         return true;
-                    case R.id.Search:
-                        loadFragment(new SearchActivity());
-                        return true;
                     default:
                         return false;
                 }
@@ -49,5 +46,4 @@ public class MainActivity extends AppCompatActivity {
         transaction.addToBackStack(null);
         transaction.commit();
     }
-
 }
