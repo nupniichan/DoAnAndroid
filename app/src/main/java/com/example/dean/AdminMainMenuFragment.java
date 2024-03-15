@@ -258,7 +258,7 @@ public class AdminMainMenuFragment extends Fragment {
 
                                         Log.d("StorageData", "Size: " + musicList.size());
 
-                                        musicAdapter.SetData(musicList);
+                                        musicAdapter.setData(musicList);
                                         loadingProgressBar.setVisibility(View.GONE);
 
                                         mediaPlayer.release();
@@ -300,7 +300,7 @@ public class AdminMainMenuFragment extends Fragment {
                 }
             }
         }
-        musicAdapter.SetData(filteredMusicList);
+        musicAdapter.setData(filteredMusicList);
     }
     private void _filterDataFromFirebase(String searchText){
         List<music> filteredMusicList = new ArrayList<>();
@@ -315,5 +315,6 @@ public class AdminMainMenuFragment extends Fragment {
                 }
             }
         }
+        musicAdapter.setData(filteredMusicList);
     }
 }
