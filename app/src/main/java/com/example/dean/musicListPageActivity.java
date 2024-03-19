@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -35,6 +36,7 @@ public class musicListPageActivity extends Fragment {
     private StorageReference storageRef = storage.getReference();
     private ProgressBar loadingProgressBar;
 
+    private TextView loadingText;
     private List<music> allMusicList = new ArrayList<>();
 
     @Nullable
@@ -44,6 +46,7 @@ public class musicListPageActivity extends Fragment {
         setHasOptionsMenu(true);
 
         loadingProgressBar = view.findViewById(R.id.adminLoadingProgressBar);
+        loadingText = view.findViewById(R.id.loadingText);
         CreateRecyclerViewAndAdapter(view);
         CreateToolBar(view);
         return view;
@@ -88,7 +91,6 @@ public class musicListPageActivity extends Fragment {
         searchView.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
             public boolean onClose() {
-                // getAllAudioFilesFromStorage();
                 return false;
             }
         });
@@ -102,7 +104,7 @@ public class musicListPageActivity extends Fragment {
     private void getAllAudioFilesFromStorage() {
         try {
             loadingProgressBar.setVisibility(View.VISIBLE);
-
+            loadingText.setVisibility(View.VISIBLE);
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageRef = storage.getReference().child("audio");
 
@@ -142,7 +144,7 @@ public class musicListPageActivity extends Fragment {
 
                                         musicAdapter.SetData(musicList);
                                         loadingProgressBar.setVisibility(View.GONE);
-
+                                        loadingText.setVisibility(View.GONE);
                                         mediaPlayer.release();
                                     } catch (IOException | IllegalArgumentException | SecurityException e) {
                                         e.printStackTrace();

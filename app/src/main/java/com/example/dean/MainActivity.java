@@ -23,10 +23,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.Home:
+                    case R.id.HomeIcon:
                         loadFragment(new MainMenuActivity());
                         return true;
-                    case R.id.Library:
+                    case R.id.LibraryIcon:
                         loadFragment(new musicListPageActivity());
                         return true;
                     default:

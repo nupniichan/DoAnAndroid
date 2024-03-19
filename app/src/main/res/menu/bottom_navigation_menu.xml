@@ -1,12 +1,14 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/Home"
-        android:title="Home"
+        android:id="@+id/HomeIcon"
+        android:title="Trang chủ"
         android:icon="@drawable/ic_home"
         />
 
     <item
-        android:id="@+id/Library"
-        android:title="Library"
+        android:id="@+id/LibraryIcon"
+        android:title="Thư viện"
         android:icon="@drawable/ic_library" />
+    <group />
 </menu>

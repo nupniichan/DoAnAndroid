@@ -62,7 +62,7 @@
                         android:id="@+id/addMusicToLibraryImageView"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
-                        android:src="@drawable/addbox_vector" />
+                        android:src="@drawable/libraryadd_vector" />
 
                     <TextView
                         android:id="@+id/addMusicToLibraryTextView"

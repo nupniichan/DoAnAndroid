@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.storage.FirebaseStorage;
@@ -87,17 +88,14 @@ import com.google.firebase.storage.StorageReference;
 
                     fileRef.updateMetadata(updatedMetadata)
                             .addOnSuccessListener(updatedStorageMetadata -> {
-                                showSnackbar(view, "Cập nhật thành công");
+                                Toast.makeText(getContext(), "Sửa thông tin nhạc thành công", Toast.LENGTH_SHORT).show();
                             })
                             .addOnFailureListener(exception -> {
-                                showSnackbar(view, "Error updating metadata: " + exception.getMessage());
+                                Toast.makeText(getContext(), "Có lỗi trong quá trình cập nhật thông tin", Toast.LENGTH_SHORT).show();
                             });
                 })
                 .addOnFailureListener(exception -> {
-                    showSnackbar(view, "Error getting current metadata: " + exception.getMessage());
+                    Toast.makeText(getContext(), "Có lỗi trong quá trình cập nhật thông tin", Toast.LENGTH_SHORT).show();
                 });
-    }
-    private void showSnackbar(View view, String message) {
-        Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show();
     }
 }

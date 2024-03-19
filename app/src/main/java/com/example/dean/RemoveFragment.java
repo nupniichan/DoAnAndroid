@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.storage.FirebaseStorage;
@@ -57,17 +58,17 @@ public class RemoveFragment extends DialogFragment {
 
             StorageReference fileRef = storageRef.child("audio/" + musicFileName);
             fileRef.delete().addOnSuccessListener(aVoid -> {
-                showSnackbar(view, "Xóa thành công");
+                Toast.makeText(getContext(), "Xoá nhạc thành công", Toast.LENGTH_SHORT).show();
             }).addOnFailureListener(exception -> {
-                showSnackbar(view, "Lỗi khi xóa: " + exception.getMessage());
+                Toast.makeText(getContext(), "Có lỗi khi xoá nhạc", Toast.LENGTH_SHORT).show();
             });
 
             if (albumFilePath != null && !albumFilePath.isEmpty()) {
                 StorageReference albumArtRef = storageRef.child(albumFilePath);
                 albumArtRef.delete().addOnSuccessListener(aVoid -> {
-                    showSnackbar(view, "Xóa album art thành công");
+                    Toast.makeText(getContext(), "Xoá album cover thành công", Toast.LENGTH_SHORT).show();
                 }).addOnFailureListener(exception -> {
-                    showSnackbar(view, "Lỗi khi xóa album art: " + exception.getMessage());
+                    Toast.makeText(getContext(), "Có lỗi trong khi xoá album cover", Toast.LENGTH_SHORT).show();
                 });
             }
         }

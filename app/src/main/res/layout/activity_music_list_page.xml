@@ -26,9 +26,8 @@
                 android:background="@color/black"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 app:popupTheme="@style/Theme.AppCompat.Light"
-                app:title="Danh sách nhạc" />
+                app:title="Thư viện" />
 
-            g
 
             <HorizontalScrollView
                 android:layout_width="match_parent"
@@ -52,9 +51,18 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:layout_gravity="center"
-                android:outlineAmbientShadowColor="#F4F4F4"
-                android:outlineSpotShadowColor="#FFFFFF"
+                android:backgroundTint="#000000"
+                android:progressTint="#000000"
                 android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/loadingText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Chờ xíu nha (▰˘◡˘▰)..."
+                android:visibility="gone" />
+
 
         </LinearLayout>
     </ScrollView>

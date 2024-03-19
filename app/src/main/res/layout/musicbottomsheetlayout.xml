@@ -2,9 +2,11 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
 
     <ScrollView
+        android:background="@drawable/layout_outline"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="none">
@@ -62,7 +64,7 @@
                         android:id="@+id/addMusicToLibraryImageView"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
-                        android:src="@drawable/addbox_vector" />
+                        android:src="@drawable/libraryadd_vector" />
 
                     <TextView
                         android:id="@+id/addMusicToLibraryTextView"

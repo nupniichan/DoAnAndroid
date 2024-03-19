@@ -149,11 +149,20 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
     }
 
     private void removeMusic(int position) {
-        // Xử lý logic xóa bài hát ở vị trí position
+        if (position >= 0 && position < musicList.size()) {
+            music musicToRemove = musicList.get(position);
+            RemoveFragment removeMusicFragment = new RemoveFragment(musicToRemove);
+            removeMusicFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "remove_music");
+        }
     }
 
     public void editMusic(Context context, int position) {
-        // Xử lý logic chỉnh sửa bài hát ở vị trí position
+        if (position >= 0 && position < musicList.size()) {
+            music musicToEdit = musicList.get(position);
+
+            EditFragment editFragment = EditFragment.newInstance(musicToEdit);
+            editFragment.show(((AppCompatActivity) context).getSupportFragmentManager(), "edit_fragment");
+        }
     }
 
     public void playMusic(int position) {

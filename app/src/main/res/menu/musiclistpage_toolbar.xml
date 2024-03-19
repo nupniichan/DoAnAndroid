@@ -10,6 +10,6 @@
     <item
         android:title="Addbox"
         android:id="@+id/addboxvector"
-        android:icon="@drawable/addbox_vector"
+        android:icon="@drawable/libraryadd_vector"
         app:showAsAction="always"/>
 </menu>

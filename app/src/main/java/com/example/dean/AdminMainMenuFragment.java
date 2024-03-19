@@ -28,6 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -190,9 +191,11 @@ public class AdminMainMenuFragment extends Fragment {
                                         audioRef.getDownloadUrl().addOnSuccessListener(audioDownloadUrl -> {
 /*                                            String downloadUrl = audioDownloadUrl.toString();
                                             saveFilePathAndMetadataToFirestore(downloadUrl);*/
+                                            Toast.makeText(getContext(), "Thêm nhạc thành công!", Toast.LENGTH_SHORT).show();
                                         });
                                     })
                                     .addOnFailureListener(e -> {
+                                        Toast.makeText(getContext(), "Thêm nhạc vào firebase thất bại!", Toast.LENGTH_SHORT).show();
                                     });
                         });
                     },
