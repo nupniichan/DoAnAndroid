@@ -11,13 +11,11 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHolder> {
@@ -26,22 +24,30 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
 
     public MusicAdapter(Context mContext) {
         this.mContext = mContext;
+        this.musicList = new ArrayList<>();
     }
-    public void SetData(List<music> list){
-        this.musicList = list;
+
+    public void setData(List<music> list) {
+        this.musicList.clear();
+        this.musicList.addAll(list);
         notifyDataSetChanged();
+    }
+
+    public List<music> getData() {
+        return musicList;
     }
 
     @NonNull
     @Override
     public MusicViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.music_item,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.music_item, parent, false);
         return new MusicViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MusicViewHolder holder, int position) {
         music _music = musicList.get(position);
+
         ImageButton musicOptionMenu = holder.itemView.findViewById(R.id.musicOptionMenu);
         musicOptionMenu.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -76,6 +82,18 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
                 bottomDialog.show(((AppCompatActivity)mContext).getSupportFragmentManager(),"bottom_dialog");
             }
         });
+
+        // Tự động phát nhạc khi người dùng chọn một bài hát trong danh sách
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int position = holder.getAdapterPosition();
+                playMusic(position);
+            }
+        });
+
+        // Các phương thức xử lý sự kiện khác
+
         if (_music == null)
             return;
 
@@ -102,21 +120,42 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
         holder.musicLength.setText(String.format("%02d:%02d", minutes, seconds));
     }
 
-    private void removeMusic(int position) {
-        if (position >= 0 && position < musicList.size()) {
-            music musicToRemove = musicList.get(position);
-            RemoveFragment removeMusicFragment = new RemoveFragment(musicToRemove);
-            removeMusicFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "remove_music");
-        }
+    @Override
+    public int getItemCount() {
+        return musicList != null ? musicList.size() : 0;
     }
-    public void editMusic(Context context, int position) {
-        if (position >= 0 && position < musicList.size()) {
-            music musicToEdit = musicList.get(position);
 
-            EditFragment editFragment = EditFragment.newInstance(musicToEdit);
-            editFragment.show(((AppCompatActivity) context).getSupportFragmentManager(), "edit_fragment");
+    public class MusicViewHolder extends RecyclerView.ViewHolder {
+        private ImageView imgMusic;
+        private TextView musicTitle;
+        private TextView artistName;
+        private TextView musicLength;
+        private ImageButton btnPrevious;
+        private ImageButton btnSkip;
+        private ImageButton btnReplay;
+        private ImageButton btnShuffle;
+
+        public MusicViewHolder(@NonNull View itemView) {
+            super(itemView);
+            imgMusic = itemView.findViewById(R.id.musicImageView);
+            musicTitle = itemView.findViewById(R.id.musicNameTextView);
+            artistName = itemView.findViewById(R.id.ArtistTextView);
+            musicLength = itemView.findViewById(R.id.musicLengthTextView);
+            btnPrevious = itemView.findViewById(R.id.id_prev);
+            btnSkip = itemView.findViewById(R.id.id_skip);
+            btnReplay = itemView.findViewById(R.id.id_repeat);
+            btnShuffle = itemView.findViewById(R.id.id_shuffle);
         }
     }
+
+    private void removeMusic(int position) {
+        // Xử lý logic xóa bài hát ở vị trí position
+    }
+
+    public void editMusic(Context context, int position) {
+        // Xử lý logic chỉnh sửa bài hát ở vị trí position
+    }
+
     public void playMusic(int position) {
         if (position >= 0 && position < musicList.size()) {
             music selectedMusic = musicList.get(position);
@@ -126,31 +165,6 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
             intent.putExtra("albumArtFilePath", selectedMusic.getAlbumArtBitmap());
             intent.putExtra("musicFilePath", selectedMusic.getUriFilePath());
             mContext.startActivity(intent);
-        }
-    }
-    public List<music> getData() {
-        return musicList;
-    }
-    @Override
-    public int getItemCount() {
-        if (musicList != null){
-            return musicList.size();
-        }
-        return 0;
-    }
-
-    public class MusicViewHolder extends RecyclerView.ViewHolder{
-
-        private ImageView imgMusic;
-        private TextView musicTitle;
-        private TextView artistName;
-        private TextView musicLength;
-        public MusicViewHolder(@NonNull View itemView) {
-            super(itemView);
-            imgMusic = itemView.findViewById(R.id.musicImageView);
-            musicTitle = itemView.findViewById(R.id.musicNameTextView);
-            artistName = itemView.findViewById(R.id.ArtistTextView);
-            musicLength = itemView.findViewById(R.id.musicLengthTextView);
         }
     }
 }
