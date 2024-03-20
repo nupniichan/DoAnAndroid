@@ -1,5 +1,6 @@
 package com.example.dean;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,9 +11,10 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -24,14 +26,18 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
@@ -46,47 +52,67 @@ import java.util.UUID;
 
 public class AdminMainMenuFragment extends Fragment {
 
-    Button backToUserMenu;
     private RecyclerView musicRecylerView;
     private MusicAdapter musicAdapter;
     private static final int PICK_AUDIO_REQUEST = 1;
     private ProgressBar loadingProgressBar;
+    private TextView loadingText;
+    private Context mContext;
 
     private List<music> allMusicList = new ArrayList<>();
-
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        mContext = context;
+    }
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_admin_main_menu, container, false);
         setHasOptionsMenu(true);
         loadingProgressBar = view.findViewById(R.id.adminLoadingProgressBar);
-        backToUserMenu = view.findViewById(R.id.btnBackToUserMenu);
-        backToUserMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(requireContext(), MainActivity.class);
-                startActivity(intent);
-            }
-        });
-        Button btnAdminReload = view.findViewById(R.id.btnAdminReload);
-        btnAdminReload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                reloadFragment();
-                requireActivity().finish();
-            }
-        });
+        loadingText = view.findViewById(R.id.adminloadingText);
+        SearchView searchView = view.findViewById(R.id.adminsearchView);
         CreateRecyclerViewAndAdapter(view);
         CreateToolBar(view);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                filterDataFromFirebase(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (newText.isEmpty()) {
+                    getAllAudioFilesFromStorage();
+                }
+                return false;
+            }
+        });
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                getAllAudioFilesFromStorage();
+                return false;
+            }
+        });
+        // Xử lý sự kiện khi người dùng chạm vào vùng ngoài của SearchView
+        view.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                // Kiểm tra nếu sự kiện chạm là ACTION_DOWN (người dùng bắt đầu chạm vào màn hình)
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    // Kiểm tra nếu SearchView đang được focus
+                    if (searchView.hasFocus()) {
+                        // Xóa focus từ SearchView, điều này sẽ đóng bàn phím
+                        searchView.clearFocus();
+                    }
+                }
+                return false;
+            }
+        });
         return view;
-    }
-    private void reloadFragment() {
-        AdminMainMenuFragment adminMainMenuFragment = new AdminMainMenuFragment();
-        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.fragment_container, adminMainMenuFragment);
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
     }
     private void CreateToolBar(View view) {
         Toolbar toolbar = view.findViewById(R.id.musicListPagetoolBar);
@@ -106,124 +132,11 @@ public class AdminMainMenuFragment extends Fragment {
         musicRecylerView.setAdapter(musicAdapter);
     }
 
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.musiclistpage_toolbar, menu);
-        MenuItem addBoxItem = menu.findItem(R.id.addboxvector);
-        MenuItem searchItem = menu.findItem(R.id.searchItem);
-        addBoxItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(@NonNull MenuItem item) {
-                Intent intent = new Intent();
-                intent.setType("audio/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Chọn file âm thanh"), PICK_AUDIO_REQUEST);
-                return true;
-            }
-        });
-
-        SearchView searchView = (SearchView) searchItem.getActionView();
-        searchView.setQueryHint("Nhập tên bài nhạc");
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                _filterDataFromFirebase(query);
-                return false;
-            }
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                filterDataFromFirebase(newText);
-                return false;
-            }
-        });
-        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
-            @Override
-            public boolean onClose() {
-                return false;
-            }
-        });
-        searchView.setOnQueryTextFocusChangeListener((v, hasFocus) -> {
-            if (!hasFocus) {
-                searchView.setIconified(true);
-            }
-        });
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == PICK_AUDIO_REQUEST && resultCode == android.app.Activity.RESULT_OK && data != null && data.getData() != null) {
-            Uri audioUri = data.getData();
-            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-            retriever.setDataSource(getContext(), audioUri);
-
-            String audioTitle = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-            String audioArtist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
-
-            // Lấy dữ liệu album art
-            byte[] albumArtBytes = retriever.getEmbeddedPicture();
-            Bitmap albumArtBitmap = BitmapFactory.decodeByteArray(albumArtBytes, 0, albumArtBytes.length);
-
-            FirebaseStorage storage = FirebaseStorage.getInstance();
-            StorageReference storageRef = storage.getReference();
-            String audioFileName = audioTitle + " - "  +System.currentTimeMillis();
-            StorageReference audioRef = storageRef.child("audio/" + audioFileName);
-            String musicID = UUID.randomUUID().toString();
-            String albumArtFileName = "album_art_" + System.currentTimeMillis() + ".jpg";
-            StorageReference albumArtRef = storageRef.child("images/" + albumArtFileName);
-
-            // Lưu Bitmap vào Firebase Storage và xử lý sau khi tải lên thành công
-            saveBitmapToFirebaseStorage(albumArtBitmap, albumArtFileName,
-                    taskSnapshot -> {
-                        albumArtRef.getDownloadUrl().addOnSuccessListener(albumArtDownloadUrl -> {
-                            String albumArtUrl = albumArtDownloadUrl.toString();
-
-                            StorageMetadata metadata = new StorageMetadata.Builder()
-                                    .setCustomMetadata("musicID", musicID)
-                                    .setCustomMetadata("title", audioTitle)
-                                    .setCustomMetadata("artist", audioArtist)
-                                    .setCustomMetadata("albumArtUrl", albumArtUrl)
-                                    .build();
-
-                            audioRef.putFile(audioUri, metadata)
-                                    .addOnSuccessListener(audioUploadTaskSnapshot -> {
-                                        audioRef.getDownloadUrl().addOnSuccessListener(audioDownloadUrl -> {
-/*                                            String downloadUrl = audioDownloadUrl.toString();
-                                            saveFilePathAndMetadataToFirestore(downloadUrl);*/
-                                            Toast.makeText(getContext(), "Thêm nhạc thành công!", Toast.LENGTH_SHORT).show();
-                                        });
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        Toast.makeText(getContext(), "Thêm nhạc vào firebase thất bại!", Toast.LENGTH_SHORT).show();
-                                    });
-                        });
-                    },
-                    e -> {
-                    });
-        }
-    }
-
-    private void saveBitmapToFirebaseStorage(Bitmap bitmap, String fileName,
-                                             OnSuccessListener<UploadTask.TaskSnapshot> onSuccessListener,
-                                             OnFailureListener onFailureListener) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] data = baos.toByteArray();
-
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageRef = storage.getReference();
-        StorageReference imageRef = storageRef.child("images/" + fileName);
-
-        UploadTask uploadTask = imageRef.putBytes(data);
-        uploadTask.addOnSuccessListener(onSuccessListener)
-                .addOnFailureListener(onFailureListener);
-    }
 
     private void getAllAudioFilesFromStorage() {
         try {
             loadingProgressBar.setVisibility(View.VISIBLE);
-
+            loadingText.setVisibility(View.VISIBLE);
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageRef = storage.getReference().child("audio");
 
@@ -243,6 +156,7 @@ public class AdminMainMenuFragment extends Fragment {
                                 String audioArtist = storageMetadata.getCustomMetadata("artist");
                                 String albumArt = storageMetadata.getCustomMetadata("albumArtUrl");
                                 String musicID = storageMetadata.getCustomMetadata("musicID");
+                                String albumArtFileName = storageMetadata.getCustomMetadata("albumArtName");
 
                                 item.getDownloadUrl().addOnSuccessListener(downloadUrl -> {
                                     MediaPlayer mediaPlayer = new MediaPlayer();
@@ -254,6 +168,7 @@ public class AdminMainMenuFragment extends Fragment {
                                         _music.setArtist(audioArtist != null ? audioArtist : "Unknown Artist");
                                         _music.setMusicLength(durationInMillis);
                                         _music.setAlbumArtBitmap(albumArt);
+                                        _music.setAlbumArtName(albumArtFileName);
                                         _music.setUriFilePath(downloadUrl.toString());
                                         _music.setResourceId(musicID);
                                         _music.setFilePath(item.getName());
@@ -263,35 +178,39 @@ public class AdminMainMenuFragment extends Fragment {
 
                                         musicAdapter.setData(musicList);
                                         loadingProgressBar.setVisibility(View.GONE);
-
+                                        loadingText.setVisibility(View.GONE);
                                         mediaPlayer.release();
                                     } catch (IOException | IllegalArgumentException | SecurityException e) {
                                         e.printStackTrace();
                                         Log.e("StorageData", "Error preparing MediaPlayer: " + e.getMessage());
                                         loadingProgressBar.setVisibility(View.GONE);
+                                        loadingText.setVisibility(View.GONE);
                                     }
                                 }).addOnFailureListener(e -> {
                                     Log.e("StorageData", "Error getting download URL: " + e.getMessage());
                                     loadingProgressBar.setVisibility(View.GONE);
+                                    loadingText.setVisibility(View.GONE);
                                 });
                             }).addOnFailureListener(e -> {
                                 Log.e("StorageData", "Error getting metadata: " + e.getMessage());
                                 loadingProgressBar.setVisibility(View.GONE);
+                                loadingText.setVisibility(View.GONE);
                             });
                         }
                     })
                     .addOnFailureListener(e -> {
                         Log.e("StorageData", "Error: " + e.getMessage());
                         loadingProgressBar.setVisibility(View.GONE);
+                        loadingText.setVisibility(View.GONE);
                     });
         } catch (Exception e) {
             Log.e("error while upload music", e.getMessage());
             loadingProgressBar.setVisibility(View.GONE);
+            loadingText.setVisibility(View.GONE);
         }
     }
 
-    private void filterDataFromFirebase(String searchText) {
-        // Tạo danh sách mới để chứa dữ liệu lọc
+    public void filterDataFromFirebase(String searchText) {
         List<music> filteredMusicList = new ArrayList<>();
         if (searchText.length() < 1) {
             getAllAudioFilesFromStorage();
@@ -305,7 +224,7 @@ public class AdminMainMenuFragment extends Fragment {
         }
         musicAdapter.setData(filteredMusicList);
     }
-    private void _filterDataFromFirebase(String searchText){
+    public void _filterDataFromFirebase(String searchText){
         List<music> filteredMusicList = new ArrayList<>();
         if (searchText.length() < 1) {
             getAllAudioFilesFromStorage();

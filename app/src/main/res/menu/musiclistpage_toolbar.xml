@@ -4,12 +4,7 @@
     <item
         android:title="@string/search_vector"
         android:id="@+id/searchItem"
-        android:icon="@drawable/search_vector"
+        android:icon="@drawable/ic_search"
         app:actionViewClass="androidx.appcompat.widget.SearchView"
-        app:showAsAction="always"/>
-    <item
-        android:title="Addbox"
-        android:id="@+id/addboxvector"
-        android:icon="@drawable/libraryadd_vector"
-        app:showAsAction="always"/>
+        app:showAsAction="ifRoom"/>
 </menu>

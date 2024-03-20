@@ -1,5 +1,6 @@
 package com.example.dean;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.fragment.app.DialogFragment;
@@ -78,6 +79,7 @@ import com.google.firebase.storage.StorageReference;
         String musicFileName = musicToEdit.getFilePath();
 
         StorageReference fileRef = storageRef.child("audio/" + musicFileName);
+        Context context = requireContext();
 
         fileRef.getMetadata()
                 .addOnSuccessListener(storageMetadata -> {
@@ -88,14 +90,14 @@ import com.google.firebase.storage.StorageReference;
 
                     fileRef.updateMetadata(updatedMetadata)
                             .addOnSuccessListener(updatedStorageMetadata -> {
-                                Toast.makeText(getContext(), "Sửa thông tin nhạc thành công", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "Sửa thông tin nhạc thành công", Toast.LENGTH_SHORT).show();
                             })
                             .addOnFailureListener(exception -> {
-                                Toast.makeText(getContext(), "Có lỗi trong quá trình cập nhật thông tin", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(context, "Có lỗi trong quá trình cập nhật thông tin", Toast.LENGTH_SHORT).show();
                             });
                 })
                 .addOnFailureListener(exception -> {
-                    Toast.makeText(getContext(), "Có lỗi trong quá trình cập nhật thông tin", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Có lỗi trong quá trình cập nhật thông tin", Toast.LENGTH_SHORT).show();
                 });
     }
 }

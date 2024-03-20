@@ -21,7 +21,6 @@ import java.util.List;
 public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHolder> {
     private Context mContext;
     private List<music> musicList;
-
     public MusicAdapter(Context mContext) {
         this.mContext = mContext;
         this.musicList = new ArrayList<>();
@@ -152,10 +151,12 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
         if (position >= 0 && position < musicList.size()) {
             music musicToRemove = musicList.get(position);
             RemoveFragment removeMusicFragment = new RemoveFragment(musicToRemove);
-            removeMusicFragment.show(((AppCompatActivity) mContext).getSupportFragmentManager(), "remove_music");
+            if (mContext instanceof AppCompatActivity) {
+                AppCompatActivity activity = (AppCompatActivity) mContext;
+                removeMusicFragment.show(activity.getSupportFragmentManager(), "remove_music");
+            }
         }
     }
-
     public void editMusic(Context context, int position) {
         if (position >= 0 && position < musicList.size()) {
             music musicToEdit = musicList.get(position);

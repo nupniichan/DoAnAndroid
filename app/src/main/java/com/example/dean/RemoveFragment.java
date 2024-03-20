@@ -1,5 +1,6 @@
 package com.example.dean;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -17,11 +18,12 @@ import com.google.firebase.storage.StorageReference;
 public class RemoveFragment extends DialogFragment {
 
     private music musicToRemove;
+
     Button confirmButton, cancelButton;
     private FirebaseStorage storage;
     private StorageReference storageRef;
 
-    public RemoveFragment(music musicToRemove) {
+    public RemoveFragment(music musicToRemove ) {
         this.musicToRemove = musicToRemove;
     }
 
@@ -54,27 +56,27 @@ public class RemoveFragment extends DialogFragment {
     private void removeMusic(View view) {
         if (musicToRemove != null) {
             String musicFileName = musicToRemove.getFilePath();
-            String albumFilePath = musicToRemove.getAlbumArtBitmap();
+            String albumArtFileName = musicToRemove.getAlbumArtName();
 
-            StorageReference fileRef = storageRef.child("audio/" + musicFileName);
-            fileRef.delete().addOnSuccessListener(aVoid -> {
-                Toast.makeText(getContext(), "Xoá nhạc thành công", Toast.LENGTH_SHORT).show();
-            }).addOnFailureListener(exception -> {
-                Toast.makeText(getContext(), "Có lỗi khi xoá nhạc", Toast.LENGTH_SHORT).show();
-            });
+            Context context = requireContext();
 
-            if (albumFilePath != null && !albumFilePath.isEmpty()) {
-                StorageReference albumArtRef = storageRef.child(albumFilePath);
-                albumArtRef.delete().addOnSuccessListener(aVoid -> {
-                    Toast.makeText(getContext(), "Xoá album cover thành công", Toast.LENGTH_SHORT).show();
+            if (context != null) {
+                StorageReference fileRef = storageRef.child("audio/" + musicFileName);
+                fileRef.delete().addOnSuccessListener(aVoid -> {
+                    Toast.makeText(context, "Xoá nhạc thành công", Toast.LENGTH_SHORT).show();
                 }).addOnFailureListener(exception -> {
-                    Toast.makeText(getContext(), "Có lỗi trong khi xoá album cover", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Có lỗi khi xoá nhạc", Toast.LENGTH_SHORT).show();
                 });
+
+                if (albumArtFileName != null && !albumArtFileName.isEmpty()) {
+                    StorageReference albumArtRef = storageRef.child("images/" + albumArtFileName);
+                    albumArtRef.delete().addOnSuccessListener(aVoid -> {
+                        Toast.makeText(context, "Xoá album cover thành công", Toast.LENGTH_SHORT).show();
+                    }).addOnFailureListener(exception -> {
+                        Toast.makeText(context, "Có lỗi trong khi xoá album cover", Toast.LENGTH_SHORT).show();
+                    });
+                }
             }
         }
-    }
-
-    private void showSnackbar(View view, String message) {
-        Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show();
     }
 }

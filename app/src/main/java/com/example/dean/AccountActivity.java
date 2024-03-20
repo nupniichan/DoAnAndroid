@@ -64,11 +64,8 @@ public class AccountActivity extends Fragment {
                 boolean isAdmin = sharedPreferences.getBoolean("isAdmin", false);
 
                 if (isAdmin) {
-                    AdminMainMenuFragment managerFragment = new AdminMainMenuFragment();
-                    getParentFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, managerFragment)
-                            .addToBackStack(null)
-                            .commit();
+                    Intent intent = new Intent(requireContext(), AdminActivity.class);
+                    startActivity(intent);
                 } else {
                     // Nếu là user thường, chuyển hướng đến MainMenuFragment
                     MainMenuActivity mainMenuFragment = new MainMenuActivity();
@@ -122,11 +119,8 @@ public class AccountActivity extends Fragment {
         editor.apply();
 
         if (isAdmin) {
-            AdminMainMenuFragment adminMenuFragment = new AdminMainMenuFragment();
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, adminMenuFragment)
-                    .addToBackStack(null)
-                    .commit();
+            Intent intent = new Intent(requireContext(), AdminActivity.class);
+            startActivity(intent);
         } else {
             // Nếu là user thường, chuyển hướng đến MainMenuFragment
             MainMenuActivity mainMenuFragment = new MainMenuActivity();

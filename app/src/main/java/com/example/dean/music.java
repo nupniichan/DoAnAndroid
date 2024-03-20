@@ -12,6 +12,16 @@ public class music implements Serializable {
     private String uriFilePath;
     private String albumArtBitmap;
 
+    public String getAlbumArtName() {
+        return albumArtName;
+    }
+
+    public void setAlbumArtName(String albumArtName) {
+        this.albumArtName = albumArtName;
+    }
+
+    private String albumArtName;
+
     public String getFilePath() {
         return filePath;
     }
@@ -24,7 +34,7 @@ public class music implements Serializable {
     }
 
 
-    public music(String resourceId, String musicTitle, String artist, long musicLength,String filePath, String albumArtBitmap, String uriFilePath){
+    public music(String resourceId, String musicTitle, String artist, long musicLength, String filePath, String albumArtBitmap, String uriFilePath, String albumArtName){
         this.resourceId = resourceId;
         this.musicTitle = musicTitle;
         this.artist = artist;
@@ -32,6 +42,7 @@ public class music implements Serializable {
         this.filePath = filePath;
         this.albumArtBitmap = albumArtBitmap;
         this.uriFilePath = uriFilePath;
+        this.albumArtName = albumArtName;
     }
     public music(){}
 
