@@ -224,19 +224,4 @@ public class AdminMainMenuFragment extends Fragment {
         }
         musicAdapter.setData(filteredMusicList);
     }
-    public void _filterDataFromFirebase(String searchText){
-        List<music> filteredMusicList = new ArrayList<>();
-        if (searchText.length() < 1) {
-            getAllAudioFilesFromStorage();
-            filteredMusicList.addAll(musicAdapter.getData());
-        }
-        else {
-            for (music musicItem : musicAdapter.getData()) {
-                if (musicItem.getMusicTitle().toLowerCase().contains(searchText.toLowerCase())) {
-                    filteredMusicList.add(musicItem);
-                }
-            }
-        }
-        musicAdapter.setData(filteredMusicList);
-    }
 }

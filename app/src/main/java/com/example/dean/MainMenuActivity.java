@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,7 +36,8 @@ import java.util.stream.Collectors;
 public class MainMenuActivity extends Fragment {
     private RecyclerView musicRecylerView;
     private RecentlyAddedAdapter musicAdapter;
-    FirebaseStorage storage = FirebaseStorage.getInstance();
+    TextView _tvUsername;
+    String username;
 
     private void CreateRecyclerViewAndAdapter(View view) {
         musicRecylerView = view.findViewById(R.id.recentlyAddedRecyclerView);
@@ -55,7 +57,15 @@ public class MainMenuActivity extends Fragment {
         View view = inflater.inflate(R.layout.activity_main_menu, container, false);
         Toolbar toolbar = view.findViewById(R.id.toolbar);
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
-
+        _tvUsername = view.findViewById(R.id._tvUsername);
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            username = bundle.getString("username");
+            _tvUsername.setText(username);
+        }
+        else {
+            _tvUsername.setText("Guest");
+        }
         setHasOptionsMenu(true);
         CreateRecyclerViewAndAdapter(view);
 

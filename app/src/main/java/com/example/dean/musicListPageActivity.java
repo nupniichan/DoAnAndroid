@@ -80,11 +80,15 @@ public class musicListPageActivity extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                return false;
+                filterDataFromFirebase(query);
+                return true;
             }
+
             @Override
             public boolean onQueryTextChange(String newText) {
-                filterDataFromFirebase(newText);
+                if (newText.isEmpty()) {
+                    getAllAudioFilesFromStorage();
+                }
                 return false;
             }
         });
@@ -171,14 +175,14 @@ public class musicListPageActivity extends Fragment {
         }
     }
 
-    private void filterDataFromFirebase(String searchText) {
-        // Tạo danh sách mới để chứa dữ liệu lọc
+    public void filterDataFromFirebase(String searchText) {
         List<music> filteredMusicList = new ArrayList<>();
         if (searchText.length() < 1) {
-            filteredMusicList.addAll(allMusicList);  // Lấy dữ liệu từ biến toàn cục
+            getAllAudioFilesFromStorage();
+            filteredMusicList.addAll(musicAdapter.getData());
         } else {
-            for (music musicItem : allMusicList) {
-                if (Utils.containsAllChars(musicItem.getMusicTitle().toLowerCase(), searchText.toLowerCase())) {
+            for (music musicItem : musicAdapter.getData()) {
+                if (Utils.containsAllChars(musicItem.getMusicTitle().toLowerCase(),searchText.toLowerCase())) {
                     filteredMusicList.add(musicItem);
                 }
             }

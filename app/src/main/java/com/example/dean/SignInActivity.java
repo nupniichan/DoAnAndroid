@@ -80,24 +80,24 @@ public class SignInActivity extends Fragment {
         String confirmPassword = edConfirmPassword.getText().toString().trim();
 
         if (TextUtils.isEmpty(username)) {
-            edUserNameC.setError("Username cannot be empty");
+            edUserNameC.setError("Tên đăng nhập không được trống");
             return false;
         }
 
         if (TextUtils.isEmpty(password)) {
-            edPasswordC.setError("Password cannot be empty");
+            edPasswordC.setError("Password không được trống");
             return false;
         }
 
         if (TextUtils.isEmpty(confirmPassword)) {
-            edConfirmPassword.setError("Confirm Password cannot be empty");
+            edConfirmPassword.setError("Không được bỏ trống trường này");
             return false;
         }
 
         if (!password.equals(confirmPassword)) {
             // Password and Confirm Password do not match
-            edPasswordC.setError("Passwords do not match");
-            edConfirmPassword.setError("Passwords do not match");
+            edPasswordC.setError("Mật khẩu nhập lại không trùng khớp");
+            edConfirmPassword.setError("Mật khẩu nhập lại không trùng khớp");
             return false;
         }
 
@@ -105,22 +105,41 @@ public class SignInActivity extends Fragment {
     }
 
     private void performSignIn() {
-        saveCredentialsToSharedPreferences();
-        AccountActivity accountActivity = new AccountActivity();
-        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, accountActivity)
-                .addToBackStack(null)
-                .commit();
-//nếu muốn để sẵn edUsername sau khi SignIn xong
-        new Handler().post(new Runnable() {
-            @Override
-            public void run() {
-                TextView edUsernameChange = accountActivity.getView().findViewById(R.id.edUserName);
-                edUsernameChange.setText(edUserNameC.getText().toString().trim());
+        if (validateInput()) {
+            String username = edUserNameC.getText().toString().trim();
+            String password = edPasswordC.getText().toString().trim();
 
+            DBHelper dbHelper = new DBHelper(requireContext());
+
+            if (!dbHelper.isUserExists(username)) {
+                dbHelper.addUser(username, password);
+            } else {
+                AccountActivity accountActivity = new AccountActivity();
+                FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.fragment_container, accountActivity)
+                        .addToBackStack(null)
+                        .commit();
             }
-        });
+
+            dbHelper.close();
+            saveCredentialsToSharedPreferences();
+
+            AccountActivity accountActivity = new AccountActivity();
+            FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, accountActivity)
+                    .addToBackStack(null)
+                    .commit();
+
+            new Handler().post(new Runnable() {
+                @Override
+                public void run() {
+                    TextView edUsernameChange = accountActivity.getView().findViewById(R.id.edUserName);
+                    edUsernameChange.setText(edUserNameC.getText().toString().trim());
+                }
+            });
+        }
     }
     private void saveCredentialsToSharedPreferences() {
         String username = edUserNameC.getText().toString().trim();

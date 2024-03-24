@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -49,6 +50,9 @@ public class AccountActivity extends Fragment {
                 if (validateInput()) {
                     performLogin();
                 }
+                else {
+                    Toast.makeText(requireContext(),"Tên đăng nhập hoặc mật khẩu sai",Toast.LENGTH_SHORT);
+                }
             }
         });
 
@@ -85,21 +89,18 @@ public class AccountActivity extends Fragment {
     private boolean validateInput() {
         String username = edUsernameC.getText().toString().trim();
         String password = edPasswordC.getText().toString().trim();
-        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("Credentials", Context.MODE_PRIVATE);
-        String savedUsername = sharedPreferences.getString("username", "");
-        String savedPassword = sharedPreferences.getString("password", "");
 
-        boolean isValid = true;
+        DBHelper dbHelper = new DBHelper(requireContext());
+        boolean isValid = dbHelper.checkUser(username, password);
+        dbHelper.close();
 
-
-        if (TextUtils.isEmpty(username) || !username.equals(savedUsername)) {
-            edUsernameC.setError("Invalid username");
-            isValid = false;
-        }
-
-        if (TextUtils.isEmpty(password) || !password.equals(savedPassword)) {
-            edPasswordC.setError("Invalid password");
-            isValid = false;
+        if (!isValid) {
+            if (TextUtils.isEmpty(username)) {
+                edUsernameC.setError("Tên đăng nhập không được bỏ trống");
+            }
+            if (TextUtils.isEmpty(password)) {
+                edPasswordC.setError("Psssword không được b trống");
+            }
         }
 
         return isValid;
@@ -109,25 +110,28 @@ public class AccountActivity extends Fragment {
         String username = edUsernameC.getText().toString().trim();
         String password = edPasswordC.getText().toString().trim();
 
-        boolean isAdmin = "admin".equals(username) && "admin".equals(password);
+        DBHelper dbHelper = new DBHelper(requireContext());
+        String savedUsername = dbHelper.getUsername(username, password);
 
-        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("Credentials", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("username", username);
-        editor.putString("password", password);
-        editor.putBoolean("isAdmin", isAdmin);
-        editor.apply();
+        dbHelper.close();
 
-        if (isAdmin) {
-            Intent intent = new Intent(requireContext(), AdminActivity.class);
-            startActivity(intent);
+        if (savedUsername != null) {
+            boolean isAdmin = "admin".equals(savedUsername) && "admin".equals(password);
+            if (isAdmin) {
+                Intent intent = new Intent(requireContext(), AdminActivity.class);
+                startActivity(intent);
+            } else {
+                MainMenuActivity mainMenuFragment = new MainMenuActivity();
+                Bundle bundle = new Bundle();
+                bundle.putString("username", savedUsername);
+                mainMenuFragment.setArguments(bundle);
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, mainMenuFragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
         } else {
-            // Nếu là user thường, chuyển hướng đến MainMenuFragment
-            MainMenuActivity mainMenuFragment = new MainMenuActivity();
-            getParentFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, mainMenuFragment)
-                    .addToBackStack(null)
-                    .commit();
+            Toast.makeText(requireContext(),"Tên đăng nhập hoặc mật khẩu sai",Toast.LENGTH_SHORT);
         }
     }
 }

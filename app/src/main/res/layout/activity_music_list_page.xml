@@ -23,7 +23,7 @@
                 android:id="@+id/musicListPagetoolBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/black"
+                android:background="@drawable/toolbarcolor"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 app:popupTheme="@style/Theme.AppCompat.Light"
                 app:title="Thư viện" />
