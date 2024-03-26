@@ -1,9 +1,8 @@
-package com.example.dean;
+package com.example.dean.account;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.InputType;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -23,6 +22,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.example.dean.MainMenuActivity;
+import com.example.dean.R;
+import com.example.dean.Utils.Utils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class AccountInfoActivity extends Fragment {

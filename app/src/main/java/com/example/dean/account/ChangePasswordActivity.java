@@ -1,4 +1,4 @@
-package com.example.dean;
+package com.example.dean.account;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -15,6 +15,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.example.dean.MainMenuActivity;
+import com.example.dean.R;
+import com.example.dean.account.AccountActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class ChangePasswordActivity extends Fragment {

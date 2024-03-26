@@ -1,4 +1,4 @@
-package com.example.dean;
+package com.example.dean.Music.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +14,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.dean.CURD.EditFragment;
+import com.example.dean.CURD.RemoveFragment;
+import com.example.dean.Music.MusicPlayer;
+import com.example.dean.Music.music;
+import com.example.dean.BottomSheet.MusicOptionsBottomSheet;
+import com.example.dean.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,14 +81,6 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
                     public void onClick(View v) {
                         int position = holder.getAdapterPosition();
                         playMusic(position);
-                        bottomDialog.dismiss();
-                    }
-                });
-                bottomDialog.setOnInformationClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        int position = holder.getAdapterPosition();
-                        // musicInformation(position);
                         bottomDialog.dismiss();
                     }
                 });

@@ -1,4 +1,4 @@
-package com.example.dean;
+package com.example.dean.account;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -18,6 +18,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.example.dean.Utils.DBHelper;
+import com.example.dean.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class SignInActivity extends Fragment {

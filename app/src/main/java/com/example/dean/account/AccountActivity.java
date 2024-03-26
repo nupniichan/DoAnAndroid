@@ -1,4 +1,4 @@
-package com.example.dean;
+package com.example.dean.account;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,14 +11,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.example.dean.admin.AdminActivity;
+import com.example.dean.Utils.DBHelper;
+import com.example.dean.MainMenuActivity;
+import com.example.dean.R;
+import com.example.dean.Utils.Utils;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class AccountActivity extends Fragment {

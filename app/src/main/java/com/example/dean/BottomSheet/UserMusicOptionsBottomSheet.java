@@ -1,4 +1,4 @@
-package com.example.dean;
+package com.example.dean.BottomSheet;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.dean.R;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 public class UserMusicOptionsBottomSheet extends BottomSheetDialogFragment {

@@ -1,4 +1,4 @@
-package com.example.dean;
+package com.example.dean.Music;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.palette.graphics.Palette;
@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.example.dean.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.IOException;

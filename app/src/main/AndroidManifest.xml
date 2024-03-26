@@ -16,7 +16,7 @@
         android:theme="@style/Theme.DeAnNew"
         tools:targetApi="31">
         <activity
-            android:name=".AdminActivity"
+            android:name=".admin.AdminActivity"
             android:exported="false" />
         <activity
             android:name=".AdminMusicOptionsBottomSheet"
@@ -28,16 +28,16 @@
             android:name=".MainMenuActivity"
             android:exported="false" />
         <activity
-            android:name=".AccountInfoActivity"
+            android:name=".account.AccountInfoActivity"
             android:exported="false" />
         <activity
-            android:name=".AccountActivity"
+            android:name=".account.AccountActivity"
             android:exported="false" />
         <activity
-            android:name=".SignInActivity"
+            android:name=".account.SignInActivity"
             android:exported="false" />
         <activity
-            android:name=".MusicPlayer"
+            android:name=".Music.MusicPlayer"
             android:exported="false" />
         <activity
             android:name=".musicListPageActivity"

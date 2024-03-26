@@ -1,4 +1,4 @@
-package com.example.dean;
+package com.example.dean.Utils;
 
 import android.content.ContentValues;
 import android.content.Context;

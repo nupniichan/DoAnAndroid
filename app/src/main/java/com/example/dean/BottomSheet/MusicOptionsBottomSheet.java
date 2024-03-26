@@ -1,4 +1,4 @@
-package com.example.dean;
+package com.example.dean.BottomSheet;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
 
+import com.example.dean.R;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 public class MusicOptionsBottomSheet extends BottomSheetDialogFragment {
@@ -22,10 +23,6 @@ public class MusicOptionsBottomSheet extends BottomSheetDialogFragment {
     private View.OnClickListener deleteClickListener;
     private View.OnClickListener playClickListener;
     private View.OnClickListener editClickListener;
-    private View.OnClickListener informationClickListener;
-    public void setOnInformationClickListener(View.OnClickListener listener) {
-        informationClickListener = listener;
-    }
     public void setOnDeleteClickListener(View.OnClickListener listener) {
         deleteClickListener = listener;
     }
@@ -49,11 +46,6 @@ public class MusicOptionsBottomSheet extends BottomSheetDialogFragment {
         CardView deleteCardView = view.findViewById(R.id.removeMusicCardView);
         if (deleteCardView != null && deleteClickListener != null) {
             deleteCardView.setOnClickListener(deleteClickListener);
-        }
-
-        CardView informationCardView = view.findViewById(R.id.informationCardView);
-        if (informationCardView != null && informationClickListener != null) {
-            deleteCardView.setOnClickListener(informationClickListener);
         }
     }
 }
