@@ -1,5 +1,6 @@
 package com.example.dean;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.palette.graphics.Palette;
 
@@ -20,15 +21,24 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class MusicPlayer extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     SeekBar timeLineBar;
     TextView currentTime;
     TextView duration;
+    private ArrayList<String> songPaths;
+    private int currentPosition=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +54,39 @@ public class MusicPlayer extends AppCompatActivity {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        // Phan next, previos
+        songPaths = intent.getStringArrayListExtra("songPaths");
+        currentPosition = intent.getIntExtra("currentPosition", 0);
+        FloatingActionButton nextButton = findViewById(R.id.id_skip);
+        FloatingActionButton prevButton = findViewById(R.id.id_prev);
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                currentPosition++;
+                if (currentPosition >= songPaths.size()) currentPosition = 0;
+                try {
+                    PrepareData(songPaths.get(currentPosition));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        prevButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                currentPosition--;
+                if (currentPosition < 0) currentPosition = songPaths.size() - 1;
+                try {
+                    PrepareData(songPaths.get(currentPosition));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
         PlayButton(musicUri);
         CreateTimeLineBar();
         CompletePlaying();
@@ -138,6 +181,36 @@ public class MusicPlayer extends AppCompatActivity {
     }
 
     private void PrepareData(String musicUri) throws IOException{
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+        StorageReference musicRef = storageRef.child("music/" + musicUri);
+        try {
+            final File localFile = File.createTempFile("tempMusic", "mp3");
+
+            musicRef.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                @Override
+                public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                    // File tải xuống thành công, bắt đầu phát nhạc từ localFile
+                    try {
+                        mediaPlayer.reset();
+                        mediaPlayer.setDataSource(localFile.getPath());
+                        mediaPlayer.prepare();
+                        mediaPlayer.start();
+                        // Cập nhật giao diện và các thông tin khác
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    // Xử lý khi tải xuống thất bại
+                    e.printStackTrace();
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         mediaPlayer.setDataSource(musicUri);
         mediaPlayer.prepare();
         mediaPlayer.seekTo(0);

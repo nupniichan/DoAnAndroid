@@ -1,4 +1,4 @@
-package com.example.dean;
+package com.example.dean.Account;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -29,6 +29,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
 
+import com.example.dean.MainActivity;
+import com.example.dean.MusicAdapter;
+import com.example.dean.R;
+import com.example.dean.Utils;
+import com.example.dean.music;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.storage.FirebaseStorage;

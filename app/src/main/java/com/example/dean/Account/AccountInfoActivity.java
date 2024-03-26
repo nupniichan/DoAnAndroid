@@ -1,4 +1,4 @@
-package com.example.dean;
+package com.example.dean.Account;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -23,6 +23,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.example.dean.MainMenuActivity;
+import com.example.dean.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class AccountInfoActivity extends Fragment {

@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.example.dean.Account.AccountActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class SignInActivity extends Fragment {

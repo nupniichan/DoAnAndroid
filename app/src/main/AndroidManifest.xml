@@ -28,10 +28,10 @@
             android:name=".MainMenuActivity"
             android:exported="false" />
         <activity
-            android:name=".AccountInfoActivity"
+            android:name=".Account.AccountInfoActivity"
             android:exported="false" />
         <activity
-            android:name=".AccountActivity"
+            android:name=".Account.AccountActivity"
             android:exported="false" />
         <activity
             android:name=".SignInActivity"
