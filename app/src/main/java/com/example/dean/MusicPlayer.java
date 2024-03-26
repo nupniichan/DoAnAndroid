@@ -10,6 +10,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 
+import android.graphics.Color;
 import android.view.View;
 import androidx.core.content.ContextCompat;
 
@@ -29,6 +30,8 @@ public class MusicPlayer extends AppCompatActivity {
     SeekBar timeLineBar;
     TextView currentTime;
     TextView duration;
+    TextView startingTime, endingTime, now_playing_tv;
+    ImageView backbtn, menu_btn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -178,7 +181,11 @@ public class MusicPlayer extends AppCompatActivity {
         currentTime = findViewById(R.id.startingTime);
         duration = findViewById(R.id.endingTime);
         timeLineBar = findViewById(R.id.timeLineBar);
-
+        startingTime = findViewById(R.id.startingTime);
+        endingTime = findViewById(R.id.endingTime);
+        now_playing_tv = findViewById(R.id.now_playing_tv);
+        backbtn = findViewById(R.id.back_btn);
+        menu_btn = findViewById(R.id.menu_btn);
         currentTime.setText(formatDuration(0));
         String getMusicName = intent.getStringExtra("musicName");
         String getArtistName = intent.getStringExtra("artistName");
@@ -193,15 +200,32 @@ public class MusicPlayer extends AppCompatActivity {
                     @Override
                     public void onResourceReady(Bitmap originalBitmap, Transition<? super Bitmap> transition) {
                         Bitmap paletteBitmap = originalBitmap.copy(originalBitmap.getConfig(), true);
-                        int dominantColor = Palette.from(paletteBitmap).generate().getDominantColor(ContextCompat.getColor(getApplicationContext(), android.R.color.black));
+                        Palette palette = Palette.from(paletteBitmap).generate();
+                        int dominantColor = palette.getDominantColor(ContextCompat.getColor(getApplicationContext(), android.R.color.black));
                         View musicPlayerView = findViewById(R.id.music_player_view);
                         musicPlayerView.setBackgroundColor(dominantColor);
-                        ImageView albumArtImageView = findViewById(R.id.cover_art);
+
+                        int textColor = isColorDark(dominantColor) ? Color.WHITE : Color.BLACK;
+                        int progressBarColor = isColorDark(dominantColor) ? Color.WHITE : Color.BLACK;
+                        songName.setTextColor(textColor);
+                        artistName.setTextColor(textColor);
+                        startingTime.setTextColor(textColor);
+                        endingTime.setTextColor(textColor);
+                        now_playing_tv.setTextColor(textColor);
+                        timeLineBar.getThumb().setTint(progressBarColor);
+                        menu_btn.setColorFilter(progressBarColor);
+                        backbtn.setColorFilter(progressBarColor);
+                        timeLineBar.getProgressDrawable().setTint(progressBarColor);
                         albumArtImageView.setImageBitmap(originalBitmap);
                     }
                 });
         songName.setText(getMusicName);
         artistName.setText(getArtistName);
+    }
+
+    private boolean isColorDark(int color) {
+        double darkness = 1 - (0.299 * Color.red(color) + 0.587 * Color.green(color) + 0.114 * Color.blue(color)) / 255;
+        return darkness >= 0.5;
     }
 
 

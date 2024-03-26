@@ -19,11 +19,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         app:itemIconTint="@color/white"
-        android:minHeight="60dp"
-        app:labelVisibilityMode="labeled"
         app:itemTextColor="@color/white"
-        app:itemBackground="@drawable/bg_bottom_navigation_item"
-        app:menu="@menu/bottom_navigation_menu"
-        />
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_navigation_menu" />
 
 </RelativeLayout>

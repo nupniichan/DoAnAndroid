@@ -32,10 +32,7 @@ public class musicListPageActivity extends Fragment {
 
     private RecyclerView musicRecylerView;
     private UserMusicAdapter musicAdapter;
-    FirebaseStorage storage = FirebaseStorage.getInstance();
-    private StorageReference storageRef = storage.getReference();
     private ProgressBar loadingProgressBar;
-
     private TextView loadingText;
     private List<music> allMusicList = new ArrayList<>();
 

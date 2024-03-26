@@ -78,6 +78,14 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
                         bottomDialog.dismiss();
                     }
                 });
+                bottomDialog.setOnInformationClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        int position = holder.getAdapterPosition();
+                        // musicInformation(position);
+                        bottomDialog.dismiss();
+                    }
+                });
                 bottomDialog.show(((AppCompatActivity)mContext).getSupportFragmentManager(),"bottom_dialog");
             }
         });
@@ -177,4 +185,14 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicViewHol
             mContext.startActivity(intent);
         }
     }
+/*    public void musicInformation(int position) {
+        if (position >= 0 && position < musicList.size()) {
+            music selectedMusic = musicList.get(position);
+            RemoveFragment removeMusicFragment = new RemoveFragment(selectedMusic);
+            if (mContext instanceof AppCompatActivity) {
+                AppCompatActivity activity = (AppCompatActivity) mContext;
+                removeMusicFragment.show(activity.getSupportFragmentManager(), "remove_music");
+            }
+        }
+    }*/
 }

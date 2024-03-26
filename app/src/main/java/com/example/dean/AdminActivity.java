@@ -79,10 +79,12 @@ public class AdminActivity extends AppCompatActivity {
                     case R.id.addMusicDrawerMenu:
                     {
                         addMusic();
+                        break;
                     }
                     case R.id.reloadAdminPageDrawerMenu:
                     {
                         reloadFragment();
+                        break;
                     }
                     case R.id.backtoUserActivityDrawerMenu:
                     {
@@ -90,6 +92,7 @@ public class AdminActivity extends AppCompatActivity {
                         Intent intent = new Intent(context, MainActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         context.startActivity(intent);
+                        break;
                     }
                 }
                 return false;
