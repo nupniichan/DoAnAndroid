@@ -1,4 +1,4 @@
-package com.example.dean;
+package com.example.dean.Music.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.dean.Music.MusicPlayer;
 import com.example.dean.Music.music;
+import com.example.dean.R;
 
 import java.util.List;
 

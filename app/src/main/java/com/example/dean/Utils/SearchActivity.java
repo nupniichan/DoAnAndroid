@@ -1,4 +1,4 @@
-package com.example.dean;
+package com.example.dean.Utils;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,6 +8,8 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import com.example.dean.R;
 
 public class SearchActivity extends Fragment {
 

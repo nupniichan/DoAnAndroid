@@ -23,6 +23,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.dean.Music.Adapter.RecentlyAddedAdapter;
 import com.example.dean.Music.music;
 import com.example.dean.Utils.Utils;
 import com.example.dean.account.AccountActivity;
