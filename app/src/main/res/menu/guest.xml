@@ -1,0 +1,9 @@
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/signIn"
+        android:title="Đăng ký" />
+    <item
+        android:id="@+id/logIn"
+        android:title="Đăng nhập" />
+</menu>

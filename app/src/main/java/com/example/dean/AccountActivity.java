@@ -3,6 +3,7 @@ package com.example.dean;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -10,9 +11,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -23,6 +26,8 @@ public class AccountActivity extends Fragment {
     EditText edUsernameC, edPasswordC;
     Button btnLoginC, btnCancelC;
 
+    TextView LITextView, tvSignUp;    private boolean isLoggedIn = false;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.activity_account, container, false);
@@ -32,8 +37,13 @@ public class AccountActivity extends Fragment {
         edUsernameC = view.findViewById(R.id.edUserName);
         edPasswordC = view.findViewById(R.id.edPassword);
         btnLoginC = view.findViewById(R.id.btLogin);
-        TextView tvSignUp = view.findViewById(R.id.tvSignUp);
-
+        tvSignUp = view.findViewById(R.id.tvSignUp);
+        LITextView = view.findViewById(R.id.LITextView);
+        if(isDarkMode())
+        {
+            LITextView.setTextColor(getResources().getColor(R.color.switch_text_color_dark));
+            tvSignUp.setTextColor(getResources().getColor(R.color.switch_text_color_dark));
+        }
         tvSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -57,27 +67,24 @@ public class AccountActivity extends Fragment {
         });
 
         btnCancelC = view.findViewById(R.id.btCancel);
-        btnCancelC.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                BottomNavigationView bottomNavigationView = requireActivity().findViewById(R.id.bottom_navigation);
-                bottomNavigationView.setVisibility(View.VISIBLE);
+        btnCancelC.setOnClickListener(view1 -> {
+            BottomNavigationView bottomNavigationView1 = requireActivity().findViewById(R.id.bottom_navigation);
+            bottomNavigationView1.setVisibility(View.VISIBLE);
 
-                // Kiểm tra quyền truy cập và chuyển hướng tương ứng
-                SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("Credentials", Context.MODE_PRIVATE);
-                boolean isAdmin = sharedPreferences.getBoolean("isAdmin", false);
+            // Kiểm tra quyền truy cập và chuyển hướng tương ứng
+            SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("Credentials", Context.MODE_PRIVATE);
+            boolean isAdmin = sharedPreferences.getBoolean("isAdmin", false);
 
-                if (isAdmin) {
-                    Intent intent = new Intent(requireContext(), AdminActivity.class);
-                    startActivity(intent);
-                } else {
-                    // Nếu là user thường, chuyển hướng đến MainMenuFragment
-                    MainMenuActivity mainMenuFragment = new MainMenuActivity();
-                    getParentFragmentManager().beginTransaction()
-                            .replace(R.id.fragment_container, mainMenuFragment)
-                            .addToBackStack(null)
-                            .commit();
-                }
+            if (isAdmin) {
+                Intent intent = new Intent(requireContext(), AdminActivity.class);
+                startActivity(intent);
+            } else {
+                // Nếu là user thường, chuyển hướng đến MainMenuFragment
+                MainMenuActivity mainMenuFragment = new MainMenuActivity();
+                getParentFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container, mainMenuFragment)
+                        .addToBackStack(null)
+                        .commit();
             }
         });
 
@@ -85,7 +92,10 @@ public class AccountActivity extends Fragment {
 
         return view;
     }
-
+    private boolean isDarkMode() {
+        int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        return currentNightMode == Configuration.UI_MODE_NIGHT_YES;
+    }
     private boolean validateInput() {
         String username = edUsernameC.getText().toString().trim();
         String password = edPasswordC.getText().toString().trim();
@@ -99,30 +109,39 @@ public class AccountActivity extends Fragment {
                 edUsernameC.setError("Tên đăng nhập không được bỏ trống");
             }
             if (TextUtils.isEmpty(password)) {
-                edPasswordC.setError("Psssword không được b trống");
+                edPasswordC.setError("Password không được bỏ trống");
             }
+            // Xóa đi các điều kiện kiểm tra username và password không cần thiết ở đây
         }
 
         return isValid;
     }
+
 
     private void performLogin() {
         String username = edUsernameC.getText().toString().trim();
         String password = edPasswordC.getText().toString().trim();
 
         DBHelper dbHelper = new DBHelper(requireContext());
-        String savedUsername = dbHelper.getUsername(username, password);
-
+        dbHelper.setLoggedInUsername(username);
+        String savedUsername = dbHelper.getUsername(password);
+        BottomNavigationView bottomNavigationView = requireActivity().findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setVisibility(View.VISIBLE);
         dbHelper.close();
 
+        // Đánh dấu là đã đăng nhập
+        Utils.setLoggedIn(true);
+        Utils.setUsername(username);
         if (savedUsername != null) {
             boolean isAdmin = "admin".equals(savedUsername) && "admin".equals(password);
             if (isAdmin) {
                 Intent intent = new Intent(requireContext(), AdminActivity.class);
                 startActivity(intent);
             } else {
+                // Chuyển hướng sang MainMenuActivity và truyền giá trị isLoggedIn và savedUsername qua bundle
                 MainMenuActivity mainMenuFragment = new MainMenuActivity();
                 Bundle bundle = new Bundle();
+                bundle.putBoolean("isLoggedIn", Utils.isLoggedIn());
                 bundle.putString("username", savedUsername);
                 mainMenuFragment.setArguments(bundle);
                 getParentFragmentManager().beginTransaction()
@@ -131,7 +150,7 @@ public class AccountActivity extends Fragment {
                         .commit();
             }
         } else {
-            Toast.makeText(requireContext(),"Tên đăng nhập hoặc mật khẩu sai",Toast.LENGTH_SHORT);
+            Toast.makeText(requireContext(), "Tên đăng nhập hoặc mật khẩu sai", Toast.LENGTH_SHORT).show();
         }
     }
 }

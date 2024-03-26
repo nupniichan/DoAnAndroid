@@ -42,12 +42,8 @@ public class AccountInfoActivity extends Fragment {
         btBackC = view.findViewById(R.id.btBack);
         Instruction = view.findViewById(R.id.instruction);
         spinner = view.findViewById(R.id.spinner);
-        Bundle arguments = getArguments();
-        if (arguments != null) {
-            String username = arguments.getString("username");
-            tvUserNameC.setText(username);
-        }
 
+        tvUserNameC.setText(Utils.getUserName());
         registerForContextMenu(tvUserNameC);
         String[] choices = {"Nam", "Nữ", "X"};
 
@@ -58,36 +54,19 @@ public class AccountInfoActivity extends Fragment {
         spinner.setAdapter(adapter);
 
         spinner.setSelection(2);
-         Instruction.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showInstructionsDialog();
-            }
-        });
-        btBackC.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                MainMenuActivity mainMenuActivity = new MainMenuActivity();
-                BottomNavigationView bottomNavigationView = requireActivity().findViewById(R.id.bottom_navigation);
+        Instruction.setOnClickListener(v -> showInstructionsDialog());
+        btBackC.setOnClickListener(view1 -> {
+            MainMenuActivity mainMenuActivity = new MainMenuActivity();
+            BottomNavigationView bottomNavigationView1 = requireActivity().findViewById(R.id.bottom_navigation);
 
-                bottomNavigationView.setVisibility(View.VISIBLE);
-                FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-                fragmentManager.beginTransaction()
-                        .replace(R.id.fragment_container, mainMenuActivity)
-                        .addToBackStack(null)
-                        .commit();
+            bottomNavigationView1.setVisibility(View.VISIBLE);
+            FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.fragment_container, mainMenuActivity)
+                    .addToBackStack(null)
+                    .commit();
 
-                new Handler().post(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Update the userWelcome TextView in the MainMenuFragment
-                        TextView userWelcomeTextView = mainMenuActivity.getView().findViewById(R.id.userWelcome);
-                        if (userWelcomeTextView != null) {
-                            userWelcomeTextView.setText("Xin chào, " + tvUserNameC.getText().toString().trim() + "!");
-                        }
-                    }
-                });
-            }
+
         });
 
         return view;

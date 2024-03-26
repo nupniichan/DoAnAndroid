@@ -19,19 +19,16 @@ public class MainActivity extends AppCompatActivity {
 
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.HomeIcon:
-                        loadFragment(new MainMenuActivity());
-                        return true;
-                    case R.id.LibraryIcon:
-                        loadFragment(new musicListPageActivity());
-                        return true;
-                    default:
-                        return false;
-                }
+        bottomNavigationView.setOnNavigationItemSelectedListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.HomeIcon:
+                    loadFragment(new MainMenuActivity());
+                    return true;
+                case R.id.LibraryIcon:
+                    loadFragment(new musicListPageActivity());
+                    return true;
+                default:
+                    return false;
             }
         });
 

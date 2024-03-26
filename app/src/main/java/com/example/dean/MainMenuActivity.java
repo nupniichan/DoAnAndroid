@@ -10,11 +10,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -39,6 +43,7 @@ public class MainMenuActivity extends Fragment {
     TextView _tvUsername;
     String username;
 
+
     private void CreateRecyclerViewAndAdapter(View view) {
         musicRecylerView = view.findViewById(R.id.recentlyAddedRecyclerView);
 
@@ -58,19 +63,42 @@ public class MainMenuActivity extends Fragment {
         Toolbar toolbar = view.findViewById(R.id.toolbar);
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
         _tvUsername = view.findViewById(R.id._tvUsername);
-        Bundle bundle = getArguments();
-        if (bundle != null) {
-            username = bundle.getString("username");
+        Switch darkModeSwitch = view.findViewById(R.id.darkModeSwitch);
+        ConstraintLayout roundedCornersLayout = view.findViewById(R.id.roundedCorners);
+
+        int currentMode = AppCompatDelegate.getDefaultNightMode();
+
+        darkModeSwitch.setChecked(currentMode == AppCompatDelegate.MODE_NIGHT_YES);
+
+        roundedCornersLayout.setBackground(getResources().getDrawable(currentMode == AppCompatDelegate.MODE_NIGHT_YES ?
+                R.drawable.rounded_corners_dark : R.drawable.rounded_corners_light));
+        darkModeSwitch.setTextColor(getResources().getColor(currentMode == AppCompatDelegate.MODE_NIGHT_YES ?
+                R.color.switch_text_color_dark : R.color.switch_text_color_light));
+
+        darkModeSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                // Enable dark mode
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            } else {
+                // Disable dark mode
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            }
+        });
+        username = Utils.getUserName();
+
+        // Hiển thị username hoặc "Guest" tùy thuộc vào trạng thái đăng nhập
+        if (Utils.isLoggedIn()) {
             _tvUsername.setText(username);
-        }
-        else {
+        } else {
             _tvUsername.setText("Guest");
         }
+
         setHasOptionsMenu(true);
         CreateRecyclerViewAndAdapter(view);
 
         return view;
     }
+
 
 
     @Override
@@ -82,17 +110,78 @@ public class MainMenuActivity extends Fragment {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        BottomNavigationView bottomNavigationView = requireActivity().findViewById(R.id.bottom_navigation);
-        bottomNavigationView.setVisibility(View.GONE);
-        if (id == R.id.person_vector) {
-            FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.fragment_container, new AccountActivity())
-                    .addToBackStack(null)
-                    .commit();
-            return true;
+        switch (id) {
+            case R.id.person_vector:
+                if (!Utils.isLoggedIn()) {
+                    // Inflate guest menu
+                    PopupMenu guestMenu = new PopupMenu(requireContext(), getActivity().findViewById(R.id.person_vector));
+                    guestMenu.getMenuInflater().inflate(R.menu.guest, guestMenu.getMenu());
+                    guestMenu.setOnMenuItemClickListener(menuItem -> {
+                        // Handle guest menu item clicks
+                        switch (menuItem.getItemId()) {
+                            case R.id.signIn:
+                                FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+                                fragmentManager.beginTransaction()
+                                        .replace(R.id.fragment_container, new SignInActivity())
+                                        .addToBackStack(null)
+                                        .commit();
+                                break;
+                            case R.id.logIn:
+                                fragmentManager = requireActivity().getSupportFragmentManager();
+                                fragmentManager.beginTransaction()
+                                        .replace(R.id.fragment_container, new AccountActivity())
+                                        .addToBackStack(null)
+                                        .commit();
+                                break;
+
+                        }
+                        return true;
+                    });
+                    guestMenu.show();
+                } else {
+                    // Inflate user menu
+                    PopupMenu userMenu = new PopupMenu(requireContext(), getActivity().findViewById(R.id.person_vector));
+                    userMenu.getMenuInflater().inflate(R.menu.user, userMenu.getMenu());
+                    userMenu.setOnMenuItemClickListener(menuItem -> {
+                        // Handle user menu item clicks
+                        switch (menuItem.getItemId()) {
+                            case R.id.account:
+                                AccountInfoActivity accountInfoActivity = new AccountInfoActivity();
+                                Bundle bundle = new Bundle();
+                                bundle.putString("username", username);
+                                accountInfoActivity.setArguments(bundle);
+                                FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
+                                fragmentManager.beginTransaction()
+                                        .replace(R.id.fragment_container, new AccountInfoActivity())
+                                        .addToBackStack(null)
+                                        .commit();
+                                break;
+                            case R.id.changePass:
+                                fragmentManager = requireActivity().getSupportFragmentManager();
+                                fragmentManager.beginTransaction()
+                                        .replace(R.id.fragment_container, new ChangePasswordActivity())
+                                        .addToBackStack(null)
+                                        .commit();
+                                break;
+                            case R.id.logOut:
+                                Utils.setUsername(null);
+                                Utils.setLoggedIn(false);
+                                fragmentManager = requireActivity().getSupportFragmentManager();
+                                fragmentManager.beginTransaction()
+                                        .replace(R.id.fragment_container, new MainMenuActivity())
+                                        .addToBackStack(null)
+                                        .commit();
+                                break;
+
+                        }
+                        return true;
+                    });
+                    userMenu.show();
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
     private void getRecentAudioFilesFromStorage() {
         try {

@@ -14,7 +14,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String KEY_ID = "id";
     private static final String KEY_USERNAME = "username";
     private static final String KEY_PASSWORD = "password";
-
+    private String loggedInUsername;
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -72,19 +72,30 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
         return exists;
     }
-    public String getUsername(String username, String password) {
+    public String getUsername(String password) {
         SQLiteDatabase db = this.getReadableDatabase();
+        String savedUsername = null;
 
+        // Sử dụng biến instance loggedInUsername để lấy username thay vì tham số truyền vào
         Cursor cursor = db.query(TABLE_USERS, new String[]{KEY_USERNAME},
                 KEY_USERNAME + "=? AND " + KEY_PASSWORD + "=?",
-                new String[]{username, password}, null, null, null, null);
+                new String[]{loggedInUsername, password}, null, null, null, null);
 
-        String savedUsername = null;
-        if (cursor.moveToFirst()) {
-            savedUsername = cursor.getString(cursor.getColumnIndex(KEY_USERNAME));
+        if (cursor != null && cursor.moveToFirst()) {
+            int columnIndex = cursor.getColumnIndex(KEY_USERNAME);
+            if (columnIndex != -1) {
+                savedUsername = cursor.getString(columnIndex);
+            }
+            cursor.close();
         }
-        cursor.close();
+
         db.close();
         return savedUsername;
+    }
+    public void setLoggedInUsername(String username) {
+        loggedInUsername = username;
+    }
+    public String getLoggedInUsername() {
+        return loggedInUsername;
     }
 }

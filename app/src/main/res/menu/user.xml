@@ -1,0 +1,12 @@
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/account"
+        android:title="Thông tin tài khoản" />
+    <item
+        android:id="@+id/changePass"
+        android:title="Đổi mật khẩu" />
+    <item
+        android:id="@+id/logOut"
+        android:title="Đăng xuất" />
+</menu>

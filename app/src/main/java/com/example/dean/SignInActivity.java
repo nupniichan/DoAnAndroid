@@ -2,6 +2,7 @@ package com.example.dean;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -46,7 +47,12 @@ public class SignInActivity extends Fragment {
         }
 
         registerForContextMenu(edUserNameC);
+        TextView LITextView = view.findViewById(R.id.LITextView);
+        if(isDarkMode())
+        {
+            LITextView.setTextColor(getResources().getColor(R.color.switch_text_color_dark));
 
+        }
         btSignInC.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -73,7 +79,10 @@ public class SignInActivity extends Fragment {
 
         return view;
     }
-
+    private boolean isDarkMode() {
+        int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        return currentNightMode == Configuration.UI_MODE_NIGHT_YES;
+    }
     private boolean validateInput() {
         String username = edUserNameC.getText().toString().trim();
         String password = edPasswordC.getText().toString().trim();
@@ -151,4 +160,4 @@ public class SignInActivity extends Fragment {
         editor.putString("password", password);
         editor.apply();
 
-}}
+    }}
