@@ -72,25 +72,31 @@ public class DBHelper extends SQLiteOpenHelper {
         db.close();
         return exists;
     }
-    public String getUsername(String password) {
+    public String getUsername(String username, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
-        String savedUsername = null;
 
-        // Sử dụng biến instance loggedInUsername để lấy username thay vì tham số truyền vào
         Cursor cursor = db.query(TABLE_USERS, new String[]{KEY_USERNAME},
                 KEY_USERNAME + "=? AND " + KEY_PASSWORD + "=?",
-                new String[]{loggedInUsername, password}, null, null, null, null);
+                new String[]{username, password}, null, null, null, null);
 
-        if (cursor != null && cursor.moveToFirst()) {
-            int columnIndex = cursor.getColumnIndex(KEY_USERNAME);
-            if (columnIndex != -1) {
-                savedUsername = cursor.getString(columnIndex);
-            }
-            cursor.close();
+        String savedUsername = null;
+        if (cursor.moveToFirst()) {
+            savedUsername = cursor.getString(cursor.getColumnIndex(KEY_USERNAME));
         }
-
+        cursor.close();
         db.close();
         return savedUsername;
+    }
+    public void updatePassword(String username, String newPassword) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_PASSWORD, newPassword);
+
+        // Updating password for the user with the specified username
+        db.update(TABLE_USERS, values, KEY_USERNAME + " = ?", new String[]{username});
+
+        db.close();
     }
     public void setLoggedInUsername(String username) {
         loggedInUsername = username;
@@ -98,4 +104,5 @@ public class DBHelper extends SQLiteOpenHelper {
     public String getLoggedInUsername() {
         return loggedInUsername;
     }
+
 }

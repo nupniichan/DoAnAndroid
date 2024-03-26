@@ -114,7 +114,10 @@ public class AccountActivity extends Fragment {
             if (TextUtils.isEmpty(password)) {
                 edPasswordC.setError("Password không được bỏ trống");
             }
-            // Xóa đi các điều kiện kiểm tra username và password không cần thiết ở đây
+            if (!username.equals(edUsernameC) || !password.equals(edPasswordC)) {
+                edUsernameC.setError("Tên đăng nhập hoặc mật khẩu sai");
+                edPasswordC.setError("Tên đăng nhập hoặc mật khẩu sai");
+            }
         }
 
         return isValid;
@@ -127,7 +130,7 @@ public class AccountActivity extends Fragment {
 
         DBHelper dbHelper = new DBHelper(requireContext());
         dbHelper.setLoggedInUsername(username);
-        String savedUsername = dbHelper.getUsername(password);
+        String savedUsername = dbHelper.getUsername(username, password);
         BottomNavigationView bottomNavigationView = requireActivity().findViewById(R.id.bottom_navigation);
         bottomNavigationView.setVisibility(View.VISIBLE);
         dbHelper.close();

@@ -18,12 +18,12 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.dean.Music.Adapter.RecentlyAddedAdapter;
 import com.example.dean.Music.music;
 import com.example.dean.Utils.Utils;
 import com.example.dean.account.AccountActivity;
