@@ -1,5 +1,7 @@
 package com.example.dean;
 
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,12 +11,16 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.graphics.ColorFilter;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
@@ -54,8 +60,13 @@ public class musicListPageActivity extends Fragment {
 
 
     private void CreateToolBar(View view) {
+        int currentMode = AppCompatDelegate.getDefaultNightMode();
         Toolbar toolbar = view.findViewById(R.id.musicListPagetoolBar);
         ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
+        toolbar.setBackground(getResources().getDrawable(currentMode == AppCompatDelegate.MODE_NIGHT_YES ?
+                R.drawable.toolbarcolor_light : R.drawable.toolbarcolor_dark));
+        toolbar.setTitleTextColor(getResources().getColor(currentMode == AppCompatDelegate.MODE_NIGHT_YES ?
+                R.color.switch_text_color_dark : R.color.switch_text_color_light));
     }
 
     private void CreateRecyclerViewAndAdapter(View view) {
@@ -74,9 +85,18 @@ public class musicListPageActivity extends Fragment {
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.musicuserlistpage, menu);
+        int currentMode = AppCompatDelegate.getDefaultNightMode();
+        int color = getResources().getColor(currentMode == AppCompatDelegate.MODE_NIGHT_YES ? R.color.toolbarcolor_light : R.color.toolbarcolor_dark);
+        ColorFilter colorFilter = new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN);
         MenuItem searchItem = menu.findItem(R.id.searchItem);
         SearchView searchView = (SearchView) searchItem.getActionView();
+        ImageView searchIcon = searchView.findViewById(androidx.appcompat.R.id.search_button);
+        searchIcon.setColorFilter(colorFilter);
+        EditText searchEditText = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
+        searchEditText.setTextColor(color);
+        searchEditText.setHintTextColor(color);
         searchView.setQueryHint("Nhập tên bài nhạc");
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {

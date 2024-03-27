@@ -73,12 +73,14 @@ public class MainMenuActivity extends Fragment {
         int currentMode = AppCompatDelegate.getDefaultNightMode();
 
         darkModeSwitch.setChecked(currentMode == AppCompatDelegate.MODE_NIGHT_YES);
-
+        toolbar.setBackground(getResources().getDrawable(currentMode == AppCompatDelegate.MODE_NIGHT_YES ?
+                R.drawable.toolbarcolor_light : R.drawable.toolbarcolor_dark));
+        toolbar.setTitleTextColor(getResources().getColor(currentMode == AppCompatDelegate.MODE_NIGHT_YES ?
+                R.color.switch_text_color_dark : R.color.switch_text_color_light));
         roundedCornersLayout.setBackground(getResources().getDrawable(currentMode == AppCompatDelegate.MODE_NIGHT_YES ?
                 R.drawable.rounded_corners_dark : R.drawable.rounded_corners_light));
         darkModeSwitch.setTextColor(getResources().getColor(currentMode == AppCompatDelegate.MODE_NIGHT_YES ?
                 R.color.switch_text_color_dark : R.color.switch_text_color_light));
-
         darkModeSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 // Enable dark mode

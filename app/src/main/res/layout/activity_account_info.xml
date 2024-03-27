@@ -64,12 +64,11 @@
         android:id="@+id/editTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="About you:"
         android:layout_marginTop="20dp"
-        app:layout_constraintTop_toBottomOf="@id/linear"
-        app:layout_constraintStart_toStartOf="parent"
+        android:hint="Giới thiệu về bản thân bạn:"
         app:layout_constraintEnd_toEndOf="parent"
-        />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/linear" />
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -10,10 +10,10 @@
         android:id="@+id/adminMusicListPagetoolBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:subtitleTextColor="@color/white"
         android:background="@drawable/toolbarcolor"
-        app:titleTextColor="@color/white"
-        app:title="Quản lý nhạc" />
+        app:subtitleTextColor="@color/white"
+        app:title="Trang quản lý"
+        app:titleTextColor="@color/white" />
 
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawer_layout"

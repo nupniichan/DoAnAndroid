@@ -5,6 +5,10 @@
             android:icon="@drawable/ic_addbox"
             android:title="Thêm nhạc">
         </item>
+        <item android:id="@+id/managementUser"
+            android:icon="@drawable/ic_person"
+            android:title="Quản lý người dùng">
+        </item>
         <item android:id="@+id/reloadAdminPageDrawerMenu"
             android:icon="@drawable/ic_reload"
             android:title="Reload lại trang">
